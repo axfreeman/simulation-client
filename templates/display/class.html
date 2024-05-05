@@ -1,0 +1,34 @@
+<!--industries.html-->
+{{ template "header.html" .}}
+<div class="w3-section w3-card-4" style="width:fit-content; padding-top: 100px;  margin:auto">
+  <header class="w3-container w3-blue">
+    <h3 class="w3-center"> {{ .class.Name }}</h3>
+  </header>
+  <table id="class" class="w3-table-all">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td> Population </td>
+        <td>{{ .class.Population }}</td>
+      </tr>
+      <tr>
+        <td> Consumption Ratio </td>
+        <td>{{ .class.Consumption_Ratio }}</td>
+      </tr>
+      <tr>
+        <td> Revenue </td>
+        <td>{{ .class.Revenue }}</td>
+      </tr>
+      <tr>
+        <td> Assets </td>
+        <td>{{ .class.Assets }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{{ template "footer.html" .}}

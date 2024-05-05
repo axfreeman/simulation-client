@@ -1,0 +1,43 @@
+<div class="w3-section w3-card-4 w3-serif" style=" margin:auto">
+  <header class="w3-container w3-blue">
+    <h4 class="w3-center"> Class:use values </h4>
+  </header>
+
+  <table class="table table-striped w-auto" id="class-sizes">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th style="text-align:center">Consumption<br>Goods</th>
+        <th style="text-align:center">Money</th>
+        <th style="text-align:center">For<br>Sale</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!--Loop over the classes -->
+      {{range .classes }}
+
+      <tr>
+        <td style="text-align:left"><a href="/class/{{.Id}}">{{ .Name }}</a></td>
+        <td style="text-align:center">{{ .ConsumerGood.Size }}</td>
+        <td style="text-align:right">{{ .MoneyStock.Size }}</td>
+        <td style="text-align:right">{{ .SalesStock.Size }}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+
+<script>
+
+  new DataTable('#class-sizes', {
+    info: false,
+    paging: false,
+    filter: false,
+    columns: [
+      null,
+      { orderable: false },
+      { orderable: false },
+      { orderable: false },
+    ]
+  });
+</script>

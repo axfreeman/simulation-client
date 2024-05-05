@@ -1,0 +1,33 @@
+<html>
+
+<head>
+  <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+
+<body>
+  <div class="w3-section w3-card-4 w3-center" style="width:fit-content; margin-left:auto; margin-right:auto; padding-bottom: 10px;">
+    <header class="w3-container w3-blue" style="margin-bottom: 10px">
+    </header>
+    <!-- <form autocomplete="off" class="w3-container" action="/requestlogin" method="post"> -->
+      <form autocomplete="off" class="w3-container" action="/user/register" method="post">
+        <p>
+        <label>Name</label>
+        <input autocomplete="off" class="w3-input" type="text" name="username">
+      </p>
+      <p>
+        <label>Password</label>
+        <input class="w3-input" type="text" name="password">
+      </p>
+      <input style="padding-bottom: 10px;" class="w3-center w3-button w3-white w3-border w3-border-blue w3-round" type="submit" value="Submit">
+
+    </form>
+    <h3>Create an account</h3>
+    <h3>Or log in <a href="/user/login">here</a></h3>
+
+  </div>
+
+</body>
+
+</html>

@@ -1,0 +1,65 @@
+<div class="w3-section w3-card-4 w3-serif" style="width:fit-content; margin:auto">
+  <header class="w3-container w3-blue">
+    <h3 class="w3-center"> Commodities </h3>
+  </header>
+
+  <table class="table table-striped w-auto" id="commodities">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th style="text-align:center">Origin </th>
+        <th style="text-align:center">Usage </th>
+        <th>Size </th>
+        <th style="text-align:center">Total<br>Value </th>
+        <th style="text-align:center">Total<br>Price </th>
+        <th style="text-align:center">Unit<br>Value </th>
+        <th style="text-align:center">Unit<br>Price </th>
+        <th style="text-align:center">Turnover<br>Time </th>
+        <th>Demand </th>
+        <th>Supply </th>
+        <th style="text-align:center">Allocation<br>Ratio </th>
+      </tr>
+    </thead>
+    <tbody>
+      <!--Loop over the commodities  -->
+      {{range .commodities }}
+
+      <tr>
+        <td style="text-align:left"><a href="/commodity/{{.Id}}">{{ .Name }}</a></td>
+        <td style="text-align:center">{{ .Origin }}</td>
+        <td style="text-align:center">{{ .Usage }}</td>
+        <td style="text-align:right">{{ .Size }}</td>
+        <td style="text-align:right">{{ .Total_Value }}</td>
+        <td style="text-align:right">{{ .Total_Price }}</td>
+        <td style="text-align:right">{{ .Unit_Value }}</td>
+        <td style="text-align:right">{{ .Unit_Price }}</td>
+        <td style="text-align:right">{{ .Turnover_Time }}</td>
+        <td style="text-align:right">{{ .Demand }}</td>
+        <td style="text-align:right">{{ .Supply }}</td>
+        <td style="text-align:right">{{ .Allocation_Ratio }}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+<script>
+  new DataTable('#commodities', {
+    info: false,
+    paging: false,
+    filter: false,
+    columns: [
+      null,
+      null,
+      null,
+      { orderable: false },
+      { orderable: false },
+      { orderable: false },
+      { orderable: false },
+      { orderable: false },
+      { orderable: false },
+      { orderable: false },
+      { orderable: false },
+      { orderable: false }
+    ]
+  });
+</script>

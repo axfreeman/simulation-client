@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+
+<head>
+  <!--Use the title variable to set the title of the page-->
+  <title>{{ .title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="description" content="Capitalism 12.4">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
+</head>
+
+<body>
+
+<div class="w3-section w3-card-4" style="width:fit-content; margin:auto; padding-top: 80px;">
+  <header class="w3-container w3-blue">
+    <h3 class="w3-center"> {{ .Title }}</h3>
+  </header>
+
+<div class="container">
+  <nav class="w3-top" >
+    <div class="w3-bar w3-light-grey" style="width:75%; margin:auto">
+      <a class="w3-bar-item w3-button w3-light-blue w3-round-large" href="/action/reset">RESET</a>
+      <a class="w3-bar-item w3-button w3-light-blue w3-round-large" href="/user/dashboard">Dashboard</a>
+      <a class="w3-bar-item w3-button w3-light-blue w3-round-large" href="/data">Data</a>
+      <a class="w3-bar-item w3-button w3-pale-blue w3-round-large" style="padding-right: 20px;" href="/commodities">Commodities</a>
+      <a class="w3-bar-item w3-button w3-pale-blue w3-round-large" href="/industries">Industries</a>
+      <a class="w3-bar-item w3-button w3-pale-blue w3-round-large" href="/classes">Classes</a>
+      <a class="w3-bar-item w3-button w3-pale-blue w3-round-large" href="/stocks">Stocks</a>
+    </div>
+  </nav>
+</div>
+  <table id="users" class="w3-table-all w3-small">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Simulation</th>
+        <th>Logged in status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range .users}}
+      <tr>
+        <td>{{ .UserName }}</td>
+        <td>{{ .CurrentSimulation }}</td>
+        <td>{{ .LoggedIn }}</td>
+      </tr>
+      {{ end}}
+    </tbody>
+  </table>
+</div>
+
+{{ template "footer.html" .}}

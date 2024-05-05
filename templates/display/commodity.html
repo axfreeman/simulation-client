@@ -1,0 +1,71 @@
+<!--commodity.html-->
+{{ template "header.html" .}}
+
+<div class="w3-section w3-card-3" style="width:fit-content; margin:auto">
+  <header class="w3-container w3-blue">
+    <h3 class="w3-center"> Commodity {{ .commodity.Name }}</h3>
+  </header>
+  <table id="commodity" class="w3-table-all w3-small">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th style="text-align:center">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td> Origin </td>
+        <td style="text-align:center">{{ .commodity.Origin }}</td>
+      <tr>
+      <tr>
+        <td> Usage </td>
+        <td style="text-align:center">{{ .commodity.Usage }}</td>
+      <tr>
+      <tr>
+        <td> Size </td>
+        <td style="text-align:center">{{ .commodity.Size }}</td>
+      <tr>
+      <tr>
+        <td> Total Value </td>
+        <td style="text-align:center">{{ .commodity.Total_Value }}</td>
+      <tr>
+      <tr>
+        <td> Total Price </td>
+        <td style="text-align:center">{{ .commodity.Total_Price }}</td>
+      <tr>
+      <tr>
+        <td> Unit Value </td>
+        <td style="text-align:center">{{ .commodity.Unit_Value }}</td>
+      <tr>
+      <tr>
+        <td> Unit Price </td>
+        <td style="text-align:center">{{ .commodity.Unit_Price }}</td>
+      <tr>
+      <tr>
+        <td> Turnover Time </td>
+        <td style="text-align:center">{{ .commodity.Turnover_Time }}</td>
+      <tr>
+      <tr>
+        <td> Demand </td>
+        <td style="text-align:center">{{ .commodity.Demand }}</td>
+      <tr>
+      <tr>
+        <td> Supply </td>
+        <td  style="text-align:center">{{ .commodity.Supply }}</td>
+      <tr>
+      <tr>
+        <td> Allocation Ratio </td>
+        <td  style="text-align:center">{{ .commodity.Allocation_Ratio }}</td>
+      <tr>
+      <tr>
+        <td> Monetarily Effective Demand </td>
+        <td style="text-align:center">{{ .commodity.Monetarily_Effective_Demand }}</td>
+      <tr>
+      <tr>
+        <td> Investment Proportion </td>
+        <td style="text-align:center">{{ .commodity.Investment_Proportion }}</td>
+      <tr>
+    </tbody>
+  </table>
+</div>
+{{ template "footer.html" .}}

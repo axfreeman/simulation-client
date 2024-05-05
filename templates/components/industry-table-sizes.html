@@ -1,0 +1,46 @@
+<div class="w3-section w3-card-4 w3-serif" >
+  <header class="w3-container w3-blue">
+    <h4 class="w3-center"> Use Values </h4>
+  </header>
+
+  <table class="table table-striped w-auto"id ="sizes">
+    <thead>
+      <tr>
+        <th style="width:30%">Name</th>
+        <th style="text-align:center; width:15%">Constant<br>Capital</th>
+        <th style="text-align:center;width:15%">Variable<br>Capital</th>
+        <th style="text-align:center;width:15%">Money</th>
+        <th style="text-align:center;width:15%">Sales<br>(C')</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!--Loop over the industries -->
+      {{range .industries }}
+
+      <tr>
+        <td style="text-align: left"><a href="/industry/{{.Id}}">{{ .Name }}</a></td>
+        <td style="text-align:center">{{ .ConstantCapital.Size }}</td>
+        <td style="text-align:center">{{ .VariableCapital.Size}}</td>
+        <td style="text-align:center">{{ .MoneyStock.Size}}</td>
+        <td style="text-align:center">{{ .SalesStock.Size}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+
+<script>
+
+  new DataTable('#sizes', {
+    info: false,
+    paging: false,
+    filter: false,
+    columns: [
+      null,
+      { orderable: false },
+      { orderable: false },
+      { orderable: false },
+      { orderable: false },
+    ]
+  });
+</script>
