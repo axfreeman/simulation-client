@@ -38,7 +38,10 @@ since their last login. Alternatively, the user should force resynchronise with 
 # Urgent
 * Peculiar bug has surfaced that each action button has to be pushed twice
 
-# Handing server responses
+# Handling server responses
 
 * See https://www.alexedwards.net/blog/how-to-properly-parse-a-json-request-body
 
+# New since April 2024
+* In 'UserStatus' there is no need to fetch the user data if we are in synch.  
+* 

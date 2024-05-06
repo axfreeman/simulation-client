@@ -16,10 +16,42 @@ import (
 	"net/http"
 	"runtime"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 var AccessToken string
 var URLheader string
+
+var Router *gin.Engine = gin.New()
+
+// Runs once at startup.
+// Retrieve users and templates from the server database.
+func Initialise() {
+	// Retrieve users on the server
+	if !FetchAdminObject(utils.APISOURCE+`admin/users`, `users`) {
+		log.Fatal("Could not retrieve user information from the server. Stopping")
+	}
+	for _, item := range models.AdminUserList {
+		user := models.User{UserName: item.UserName, CurrentSimulationID: item.CurrentSimulationID, ApiKey: item.ApiKey}
+		models.Users[item.UserName] = &user
+	}
+
+	// Retrieve the templates on the server
+	if !FetchAdminObject(utils.APISOURCE+`templates/templates`, `templates`) {
+		log.Fatal("Could not retrieve templates information from the server. Stopping")
+	}
+}
+
+// Helper function to list out users and templates
+func ListData() {
+	fmt.Printf("\nTemplateList has %d elements which are:\n", len(models.TemplateList))
+	for i := 0; i < len(models.TemplateList); i++ {
+		fmt.Println(models.TemplateList[i])
+	}
+	m, _ := json.MarshalIndent(models.Users, " ", " ")
+	fmt.Println(string(m))
+}
 
 // Prepare and send a request for a protected service to the server
 // using the user's api key.
@@ -32,7 +64,7 @@ func ServerRequest(username string, description string, relativePath string) ([]
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
 		logging.Trace(colour.Cyan, fmt.Sprintf(" ServerRequest was called from %s#%d\n", file, no))
-		logging.Trace(colour.Cyan, fmt.Sprintf(colour.Cyan+" It was called with Username %s, description %s, relativePath %s, APIURL %s\n"+colour.Reset, username, description, relativePath, utils.APISOURCE))
+		logging.Trace(colour.Cyan, fmt.Sprintf(colour.Cyan+" Username was %s, description %s, relativePath %s, APIURL %s\n"+colour.Reset, username, description, relativePath, utils.APISOURCE))
 	}
 
 	user, ok := models.Users[username]

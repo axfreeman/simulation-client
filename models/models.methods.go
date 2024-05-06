@@ -4,6 +4,8 @@
 package models
 
 import (
+	"fmt"
+	"log"
 	"strconv"
 )
 
@@ -310,4 +312,36 @@ func (s Class_Stock) CommodityName() string {
 		}
 	}
 	return `UNKNOWN COMMODITY`
+}
+
+func (u User) Get_current_state() string {
+	id := u.CurrentSimulationID
+	sims := *u.Simulations()
+	if sims == nil {
+		return "UNKNOWN"
+	}
+
+	for i := 0; i < len(sims); i++ {
+		s := sims[i]
+		if s.Id == id {
+			return s.State
+		}
+	}
+	return "UNKNOWN"
+}
+
+// helper function to set the state of the current simulation
+// if we fail it's a programme error so we don't test for that
+func (u User) Set_current_state(new_state string) {
+	id := u.CurrentSimulationID
+	sims := *u.Simulations()
+	log.Output(1, fmt.Sprintf("resetting state to %s for user %s", new_state, u.UserName))
+	for i := 0; i < len(sims); i++ {
+		s := &sims[i]
+		if (*s).Id == id {
+			(*s).State = new_state
+			return
+		}
+		log.Output(1, fmt.Sprintf("simulation with id %d not found", id))
+	}
 }

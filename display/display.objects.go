@@ -25,15 +25,14 @@ import (
 //	Returns the username and any error.
 //	Sets 'LastVisitedPage' so we can return here after an action.
 func userStatus(ctx *gin.Context) (string, error) {
-	// Uncomment for more detailed diagnostics
+	// Comment for less detailed diagnostics
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
-		logging.Trace(colour.Cyan, fmt.Sprintf(" UserStatus was called from %s#%d\n", file, no))
+		logging.Trace(colour.Yellow, fmt.Sprintf(" UserStatus was called from %s#%d\n", file, no))
 	}
 
 	// find out what the browser knows
 	username := utils.GUESTUSER
-
 	if models.Users[username].ApiKey == "" {
 		logging.Trace(colour.Red, "ERROR: User has no api key\n")
 		return username, nil
@@ -48,77 +47,52 @@ func userStatus(ctx *gin.Context) (string, error) {
 		log.Printf("The server was upset, and replied :%v\n", err)
 		return username, err
 	}
-	log.Printf("The server has a record for user %s", username)
-
 	synched_user := models.NewUser(username)  // Isolated user record, not added to the list of users.
 	err = json.Unmarshal(body, &synched_user) // it's only there as a receptacle for the server data.
 	if err != nil {
 		log.Printf("We couldn't make sense of what the server says about user %s", username)
 		return username, err
 	}
+	userDetails, _ := json.MarshalIndent(synched_user, " ", " ")
+	logging.Trace(colour.Yellow, fmt.Sprintf("The server sent this user record: %s\n", string(userDetails)))
 
-	// If something changed on the server, update all the client data for this user
-	log.Printf("The server has told us about user %s", username)
+	logging.Trace(colour.Green, fmt.Sprintf(
+		"Client says the current simulation is %d and the server says it is %d\n",
+		models.Users[username].CurrentSimulationID,
+		synched_user.CurrentSimulationID))
+
+	// Update client data from the server if need be.
 	if models.Users[username].CurrentSimulationID != synched_user.CurrentSimulationID {
-		log.Printf("We are out of synch. Server thinks our simulation is %d and client says it is %d",
+		logging.Trace(colour.Yellow, fmt.Sprintf("We are out of synch. Server thinks our simulation is %d and client says it is %d\n",
 			synched_user.CurrentSimulationID,
-			models.Users[username].CurrentSimulationID)
+			models.Users[username].CurrentSimulationID))
+		// Resynchronise
 		if !api.FetchUserObjects(ctx, username) {
-			log.Printf("Could not retrieve data for this user")
+			logging.Trace(colour.Red, fmt.Sprintf("ERROR: Could not retrieve data for user %s\n", username))
 			return username, nil
 		}
 	}
 
 	models.Users[username].LastVisitedPage = ctx.Request.URL.Path
-	models.Users[username].CurrentSimulationID = synched_user.CurrentSimulationID
-
-	log.Printf("User %s is good to go", username)
+	logging.Trace(colour.Yellow, fmt.Sprintf("User %s is good to go\n", username))
 	return username, nil
 }
 
 // helper function to obtain the state of the current simulation
-// if no user is logged in, return null state
-func get_current_state(username string) string {
-	this_user := models.Users[username]
-	if this_user == nil {
-		return "NO KNOWN USER"
-	}
-	this_user_history := this_user.History
-	if len(this_user_history) == 0 {
-		// User doesn't yet have any simulations
-		return "NO SIMULATION YET"
-	}
+// to be replaced by inline call
+func Get_current_state(username string) string {
+	return models.Users[username].Get_current_state()
 
-	id := this_user.CurrentSimulationID
-	sims := *this_user.Simulations()
-	if sims == nil {
-		return "UNKNOWN"
-	}
-
-	for i := 0; i < len(sims); i++ {
-		s := sims[i]
-		if s.Id == id {
-			return s.State
-		}
-	}
-	return "UNKNOWN"
 }
 
-// helper function to set the state of the current simulation
-// if we fail it's a programme error so we don't test for that
+// helper function to set the state of the current simulation.
+// To be replaced by inline call
 func set_current_state(username string, new_state string) {
-	this_user := models.Users[username]
-	id := this_user.CurrentSimulationID
-	sims := *this_user.Simulations()
-	log.Output(1, fmt.Sprintf("resetting state to %s for user %s", new_state, this_user.UserName))
-	for i := 0; i < len(sims); i++ {
-		s := &sims[i]
-		if (*s).Id == id {
-			(*s).State = new_state
-			return
-		}
-		log.Output(1, fmt.Sprintf("simulation with id %d not found", id))
+	u, ok := models.Users[username]
+	if !ok {
+		return
 	}
+	u.Set_current_state(new_state)
 }
 
 // display all commodities in the current simulation
@@ -128,8 +102,8 @@ func ShowCommodities(ctx *gin.Context) {
 		utils.DisplayError(ctx, " Could not retrieve Commodities ")
 		return
 	}
-	state := get_current_state(username)
-
+	state := models.Users[username].Get_current_state()
+	logging.Trace(colour.Green, fmt.Sprintf("current state is %s\n", state))
 	ctx.HTML(http.StatusOK, "commodities.html", gin.H{
 		"Title":       "Commodities",
 		"commodities": models.Users[username].Commodities(),
@@ -146,7 +120,7 @@ func ShowIndustries(ctx *gin.Context) {
 		return
 	}
 
-	state := get_current_state(username)
+	state := models.Users[username].Get_current_state()
 	ctx.HTML(http.StatusOK, "industries.html", gin.H{
 		"Title":      "Industries",
 		"industries": models.Users[username].Industries(),
@@ -162,7 +136,7 @@ func ShowClasses(ctx *gin.Context) {
 		utils.DisplayError(ctx, " Could not retrieve Classes ")
 		return
 	}
-	state := get_current_state(username)
+	state := models.Users[username].Get_current_state()
 	ctx.HTML(http.StatusOK, "classes.html", gin.H{
 		"Title":    "Classes",
 		"classes":  models.Users[username].Classes(),
@@ -179,7 +153,7 @@ func ShowCommodity(ctx *gin.Context) {
 		return
 	}
 
-	state := get_current_state(username)
+	state := models.Users[username].Get_current_state()
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	clist := *models.Users[username].Commodities()
@@ -203,7 +177,7 @@ func ShowIndustry(ctx *gin.Context) {
 		return
 	}
 
-	state := get_current_state(username)
+	state := models.Users[username].Get_current_state()
 	id, _ := strconv.Atoi(ctx.Param("id")) //TODO check user didn't do something stupid
 	// TODO here and elsewhere create a method to get the simulation
 	ilist := *models.Users[username].Industries()
@@ -227,7 +201,7 @@ func ShowClass(ctx *gin.Context) {
 		return
 	}
 
-	state := get_current_state(username)
+	state := models.Users[username].Get_current_state()
 	id, _ := strconv.Atoi(ctx.Param("id")) //TODO check user didn't do something stupid
 	list := *models.Users[username].Classes()
 
@@ -256,7 +230,7 @@ func ShowIndexPage(ctx *gin.Context) {
 		utils.DisplayError(ctx, " Problem retrieving index page ")
 		return
 	}
-	state := get_current_state(username)
+	state := models.Users[username].Get_current_state()
 
 	api.UserMessage = `This is the home page`
 
@@ -283,7 +257,7 @@ func ShowTrace(ctx *gin.Context) {
 		return
 	}
 
-	state := get_current_state(username)
+	state := models.Users[username].Get_current_state()
 	tlist := *models.Users[username].Traces()
 
 	ctx.HTML(
@@ -298,8 +272,8 @@ func ShowTrace(ctx *gin.Context) {
 	)
 }
 
-// Retrieve all templates, and all simulations belonging to this user, from the local database
-// Display them in the user dashboard
+// Display all templates, and all simulations belonging to this user,
+// in the user dashboard.
 func UserDashboard(ctx *gin.Context) {
 
 	if _, file, no, ok := runtime.Caller(1); ok {
@@ -308,11 +282,11 @@ func UserDashboard(ctx *gin.Context) {
 
 	username, err := userStatus(ctx)
 	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve User Dashboard ")
+		utils.DisplayError(ctx, " Could not retrieve data for the user dashboard ")
 		return
 	}
 
-	state := get_current_state(username)
+	state := models.Users[username].Get_current_state()
 	slist := *models.Users[username].Simulations()
 
 	ctx.HTML(http.StatusOK, "user-dashboard.html", gin.H{
@@ -386,9 +360,9 @@ func ShowIndustryStocks(ctx *gin.Context) {
 	}
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	log.Output(1, fmt.Sprintf("User %s wants to delete simulation %d", username, id))
+	log.Output(1, fmt.Sprintf("User %s wants to show industry stocks %d", username, id))
 
-	state := get_current_state(username)
+	state := models.Users[username].Get_current_state()
 	islist := *models.Users[username].IndustryStocks()
 
 	ctx.HTML(http.StatusOK, "industry_stocks.html", gin.H{
@@ -408,8 +382,8 @@ func ShowClassStocks(ctx *gin.Context) {
 	}
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	log.Output(1, fmt.Sprintf("User %s wants to delete simulation %d", username, id))
-	state := get_current_state(username)
+	log.Output(1, fmt.Sprintf("User %s wants to show class stocks %d", username, id))
+	state := models.Users[username].Get_current_state()
 	cslist := *models.Users[username].ClassStocks()
 
 	ctx.HTML(http.StatusOK, "class_stocks.html", gin.H{

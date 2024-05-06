@@ -3,8 +3,7 @@
 
 package models
 
-// Full details of a user
-// NOTE we do not store the password - this is handled by the remote server
+// Full details of a user.
 type User struct {
 	UserName            string `json:"username"`              // Repeats the key in the map,for ease of use
 	ApiKey              string `json:"api_key"`               // The api key allocated to this user
@@ -22,7 +21,7 @@ type User struct {
 	History             []HistoryItem // the history of the current simulation
 }
 
-// Constructor for a standard initial User, containing empty entries
+// Constructor for a standard initial User, containing empty entries.
 // for fields to be populated from the server.
 func NewUser(username string) User {
 	new_datum := User{

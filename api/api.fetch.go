@@ -58,7 +58,7 @@ func (item ApiItem) Target(username string) any {
 
 // a list of items needed to fetch data from the remote server
 var ApiList = [7]ApiItem{
-	{`simulation`, `simulations/mine`},
+	{`simulation`, `simulations/`},
 	{`commodity`, `commodity/`},
 	{`industry`, `industry/`},
 	{`class`, `classes/`},
@@ -84,10 +84,14 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 		a := ApiList[i]
 		fmt.Printf(" FetchUserObjects is fetching API item %d with name %s from URL %s\n", i, a.Name, a.ApiUrl)
 		if !FetchAPI(&a, username) {
-			fmt.Println("Cannot refresh from remote server; the user probably has no simulations. Do not continue ")
+			logging.Trace(colour.Red, "There are no object to retrieve from the remote server. Do not continue \n")
 			return false
 		}
 	}
+	// Comment for shorter diagnostics
+	// s, _ := json.MarshalIndent(models.Users[username], "  ", "  ")
+	// fmt.Printf("User record after creating the simulation is %s\n", string(s))
+
 	log.Output(1, "Refresh complete")
 	return true
 }
@@ -155,8 +159,7 @@ func FetchAPI(item *ApiItem, username string) (result bool) {
 		return false
 	}
 
-	s, _ := json.MarshalIndent(models.Users[username], "  ", "  ")
-	fmt.Printf("User record after creating the simulation is %s\n", string(s))
+	fmt.Printf("Data refreshed for user %s\n", username)
 	return true
 }
 
