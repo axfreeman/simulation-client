@@ -21,45 +21,24 @@
     </thead>
     <tbody>
       <!--Loop over the classes -->
-      {{range .classes }}
+      {{range .classViews }}
 
       <tr>
         <td><a href="/class/{{.Id}}">{{ .Name }}</a></td>
-        <td><a href="/stock/{{ .ConsumerGood.Id}}">{{ .ConsumerGood.Size }}</a></td>
-        <td>{{ .ConsumerGood.Value }}</td>
-        <td>{{ .ConsumerGood.Price }}</td>
-        <td><a href="/stock/{{ .SalesStock.Id}}">{{ .SalesStock.Size }}</a></td>
-        <td>{{ .SalesStock.Value }}</td>
-        <td>{{ .SalesStock.Price }}</td>
+        {{ .ConsumptionStockSize.DisplayRounded }}
+        {{ .ConsumptionStockValue.DisplayRounded }}
+        {{ .ConsumptionStockPrice.DisplayRounded }}
+        {{ .SalesStockPrice.DisplayRounded }}
+        {{ .SalesStockValue.DisplayRounded }}
+        {{ .SalesStockPrice.DisplayRounded }}
         <td style="text-align:right">{{ .Population }}</td>
         <td style="text-align:right">{{ .Participation_Ratio }}</td>
         <td style="text-align:right">{{ .Consumption_Ratio }}</td>
-        <td style="text-align:right">{{ .Revenue }}</td>
-        <td style="text-align:right">{{ .Assets }}</td>
+        {{ .Revenue.DisplayRounded }}
+        {{ .Assets.DisplayRounded }}
       </tr>
       {{end}}
     </tbody>
   </table>
   </div>
   
-  <script>
-    new DataTable('#classes', {
-      info: false,
-      paging: false,
-      filter: false,
-      columns: [
-        null,
-        { orderable: false },
-        { orderable: false },
-        { orderable: false },
-        { orderable: false },
-        { orderable: false },
-        { orderable: false },
-        { orderable: false },
-        { orderable: false },
-        { orderable: false },
-        { orderable: false },
-        { orderable: false },        
-      ]
-    });
-  </script>

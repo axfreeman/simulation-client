@@ -1,78 +1,60 @@
 package main
 
 import (
-	"capfront/api"
 	"capfront/display"
-	"capfront/models"
-	"capfront/utils"
-	"encoding/json"
+	"capfront/fetch"
 	"fmt"
-	"log"
 
 	"github.com/gin-gonic/gin"
 )
 
-// Runs once at startup.
-// Retrieve users and templates from the server database.
-func Initialise() {
-	// Retrieve users on the server
-	if !api.FetchAdminObject(utils.APISOURCE+`admin/users`, `users`) {
-		log.Fatal("Could not retrieve user information from the server. Stopping")
-	}
-	for _, item := range models.AdminUserList {
-		user := models.User{UserName: item.UserName, CurrentSimulationID: item.CurrentSimulationID, ApiKey: item.ApiKey}
-		models.Users[item.UserName] = &user
-	}
-
-	// Retrieve the templates on the server
-	if !api.FetchAdminObject(utils.APISOURCE+`templates/templates`, `templates`) {
-		log.Fatal("Could not retrieve templates information from the server. Stopping")
-	}
-}
-
-// Helper function to list out users and templates
-func ListData() {
-	fmt.Printf("\nTemplateList has %d elements which are:\n", len(models.TemplateList))
-	for i := 0; i < len(models.TemplateList); i++ {
-		fmt.Println(models.TemplateList[i])
-	}
-	m, _ := json.MarshalIndent(models.Users, " ", " ")
-	fmt.Println(string(m))
-}
-
 func main() {
-	r := gin.New()
-	r.LoadHTMLGlob("./templates/**/*") // load the templates
 
-	fmt.Println("Welcome to capitalism")
+	display.Router.Use(gin.Recovery())
 
-	r.GET("/action/:action", display.ActionHandler)
+	// load the templates
+	display.Router.LoadHTMLGlob("./templates/**/*")
+	fmt.Println("The Rosy Dawn of Capitalism has begun")
 
-	r.GET("/commodities", display.ShowCommodities)
-	r.GET("/industries", display.ShowIndustries)
-	r.GET("/classes", display.ShowClasses)
-	r.GET("/industry_stocks", display.ShowIndustryStocks)
-	r.GET("/class_stocks", display.ShowClassStocks)
-	r.GET("/trace", display.ShowTrace)
+	// Admin group.
+	// These all access the api by the admin backdoor so are exempt from authorization.
+	display.Router.GET("/admin/reset", display.AdminReset)
+	display.Router.GET("/admin/choose-players", display.Lock)
+	display.Router.GET("/admin/play-as/:username", display.SelectUser)
+	display.Router.GET("/admin/dashboard", display.AdminDashboard)
+	display.Router.GET("/data/", display.DataHandler)
 
-	r.GET("/industry/:id", display.ShowIndustry)
-	r.GET("/commodity/:id", display.ShowCommodity)
-	r.GET("/class/:id", display.ShowClass)
+	// The endpoints below require authorization
+	// TODO couldn't get grouping to work. Pretty sure it did not work as per spec
 
-	r.GET("/user/create/:id", display.CreateSimulation)
-	r.GET("/user/switch/:id", display.SwitchSimulation)
-	r.GET("/user/delete/:id", display.DeleteSimulation)
-	r.GET("/user/restart/:id", display.RestartSimulation)
+	display.Router.GET("/action/:action", display.SynchWithServer(), display.ActionHandler)
+	display.Router.GET("/commodities", display.SynchWithServer(), display.ShowCommodities)
+	display.Router.GET("/industries", display.SynchWithServer(), display.ShowIndustries)
+	display.Router.GET("/classes", display.SynchWithServer(), display.ShowClasses)
+	display.Router.GET("/industry_stocks", display.SynchWithServer(), display.ShowIndustryStocks)
+	display.Router.GET("/class_stocks", display.SynchWithServer(), display.ShowClassStocks)
+	display.Router.GET("/trace", display.SynchWithServer(), display.ShowTrace)
+	display.Router.GET("/industry/:id", display.SynchWithServer(), display.ShowIndustry)
+	display.Router.GET("/commodity/:id", display.SynchWithServer(), display.ShowCommodity)
+	display.Router.GET("/class/:id", display.SynchWithServer(), display.ShowClass)
+	display.Router.GET("/user/create/:id", display.SynchWithServer(), display.CreateSimulation)
+	display.Router.GET("/user/switch/:id", display.SynchWithServer(), display.SwitchSimulation)
+	display.Router.GET("/user/delete/:id", display.SynchWithServer(), display.DeleteSimulation)
+	display.Router.GET("/user/restart/:id", display.SynchWithServer(), display.RestartSimulation)
+	display.Router.GET("/", display.SynchWithServer(), display.ShowIndexPage)
+	display.Router.GET("/user/dashboard", display.SynchWithServer(), display.UserDashboard)
+	display.Router.GET("/back", display.SynchWithServer(), display.Back)
+	display.Router.GET("/forward", display.SynchWithServer(), display.Forward)
+	display.Router.GET("/quit", display.SynchWithServer(), display.Quit)
 
-	r.GET("/", display.ShowIndexPage)
-	r.GET("/data/", display.DataHandler)
-	r.GET("/user/dashboard", display.UserDashboard)
-	r.GET("/admin/dashboard", display.AdminDashboard)
-	r.GET("/admin/reset", display.AdminReset)
+	// Grab user data from the server at startup. Currently, this is fixed.
+	// BUT note that if users are modified on the server, we will be out of synch.
+	// TODO set up registration.
+	// TODO Check that user changes on the server are reflected on the client.
+	fetch.Initialise()
 
-	Initialise()
-	ListData()
+	// Uncomment in extremis for very verbose diagnostic. As a first resort use the /Data endpoint when simulation is running.
+	// display.ListData()
 
-	r.Run() // Run the server
-
+	display.Router.Run("localhost:8080") // Run the server
 }

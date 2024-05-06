@@ -1,14 +1,17 @@
-<!--simulations.html-->
-
+<!--user-dashboard.html-->
 {{ template "header.html" .}}
-
 <div class="w3-container w3-center" style="width:75%; margin:auto; padding-top: 100px;">
     <div class="w3-medium">
+        {{ if eq .count 0 }}
         <header class="w3-container w3-blue">
-            <h3 class="w3-center"> Your simulations (so far) </h3>
+            <h3 class="w3-center"> {{ .username }} has no simulations yet. Choose one.</h3>
+        </header>
+        {{ else }}
+        <header class="w3-container w3-blue">
+            <h3 class="w3-center"> Simulations for player {{ .username }} </h3>
         </header>
 
-        <table id="your-simulations" class="display compact w3-small" style="width:80%">
+        <table class="w3-small" style="width:80%">
             <thead>
                 <tr>
                     <th>Name</th>
@@ -47,6 +50,7 @@
                 {{ end }}
             </tbody>
         </table>
+        {{ end }}
         <header class="w3-container w3-blue">
             <h3 class="w3-center"> Templates to choose from </h3>
         </header>

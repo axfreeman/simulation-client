@@ -19,18 +19,18 @@
     </thead>
     <tbody>
       <!--Loop over the industries -->
-      {{range .industries }}
+      {{range .industryViews }}
 
       <tr>
         <td><a href="/industry/{{.Id}}">{{ .Name }}</a></td>
-        <td style="text-align:right"> <a href="/commodity/{{ .OutputCommodity.Id}}">{{ .Output }}</a>  </td>
-        <td style="text-align:right">{{ .Output_Scale }}</td>
-        <td style="text-align:right">{{ .Output_Growth_Rate }}</td>
-        <td style="text-align:right">{{ .Initial_Capital }} </td>
-        <td style="text-align:right">{{ .Work_In_Progress }} </td>
-        <td style="text-align:right">{{ .Current_Capital }} </td>
-        <td style="text-align:right">{{ .Profit }}</td>
-        <td style="text-align:right">{{ .Profit_Rate }}</td>
+        <td><a href="/commodity/{{ .OutputCommodityId}}">{{ .Output }}</a>  </td>
+        {{ .Output_Scale.DisplayRounded }}
+        {{ .Output_Growth_Rate.Display }}
+        {{ .Initial_Capital.DisplayRounded }} 
+        {{ .Work_In_Progress.DisplayRounded }} 
+        {{ .Current_Capital.DisplayRounded }} 
+        {{ .Profit.DisplayRounded }}
+        {{ .Profit_Rate.Display }}
       </tr>
       {{end}}
     </tbody>

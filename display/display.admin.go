@@ -8,7 +8,6 @@ import (
 	"capfront/models"
 	"capfront/utils"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,39 +15,91 @@ import (
 
 // Display the admin dashboard
 func AdminDashboard(ctx *gin.Context) {
-	username, err := userStatus(ctx)
-	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve Data to delete a simulation ")
-		return
-	}
-
-	if username != "admin" {
-		utils.DisplayError(ctx, "Only the administrator can see the admin dashboard")
-		return
-	}
 	ctx.HTML(http.StatusOK, "admin-dashboard.html", gin.H{
-		"Title":    "Admin Dashboard",
-		"users":    models.Users,
-		"username": username,
+		"Title": "Admin Dashboard",
+		"users": models.AdminUserList,
 	})
 }
 
 // Resets the main database
 // Only available to admin
+// TODO not done yet
 func AdminReset(ctx *gin.Context) {
-	username := utils.GUESTUSER
+}
 
-	if username != "admin" {
-		log.Output(1, fmt.Sprintf("User %s tried to reset the database", username))
+// Authorization function.
+// Requests the server to authorize user to play.
+// The client should already know this user's ApiKey.
+// This is not a token system. It simply averts conflicts by ensuring
+// that only one client can play as a given user at the same time.
+//
+//	Asks the server to lock the user
+//
+//	If the lock fails respond with an error and display on the client.
+//
+//	If the lock succeeds, set a cookie and register the lock on the User object.
+func SelectUser(ctx *gin.Context) {
+	// pick up the cookie information that was set by SynchWithServer middleware
+	username := ctx.Params.ByName("username")
+	if username == "" {
+		utils.Trace(utils.Red, " ERROR: The router did not pick up a valid player name")
+	}
+	user := models.Users[username]
 
+	// lock this user at the server.
+	// It's just possible someone else gets in first, so abort if this doesn't work.
+	_, err := api.ServerRequest(user.ApiKey, `admin/lock/`+username)
+	if err != nil {
+		utils.DisplayError(ctx, fmt.Sprintf("Could not play as %s. Maybe somebody else got in first. Try again and tell me if the error persists", username))
+		ctx.Abort()
+		return
 	}
 
-	_, jsonErr := api.ServerRequest(username, "reset the database", `action/reset`)
-	if jsonErr != nil {
-		log.Output(1, "Reset failed")
-	} else {
-		log.Output(1, "COMPLETE RESET by admin")
+	// lock this user at the client
+	user.IsLocked = true
+
+	// Set cookie with no MaxAge and no Expiry
+	// NOTE it is claimed this will be deleted when browser closes, but it isn't.
+	// see, eg https://stackoverflow.com/questions/10617954/chrome-doesnt-delete-session-cookies/10772420#10772420
+	utils.Trace(utils.Yellow, fmt.Sprintf("user %s will play\n", username))
+	http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: username, Path: "/"})
+	ctx.Redirect(http.StatusPermanentRedirect, `/`)
+	// ctx.Request.URL.Path = `/`
+	// Router.HandleContext(ctx)
+}
+
+func Lock(ctx *gin.Context) {
+	ctx.HTML(http.StatusOK, "choose-player.html", gin.H{
+		"Title":      "Choose player",
+		"adminusers": models.AdminUserList,
+		"users":      models.Users,
+	})
+}
+
+// Quit playing as the current user.
+//
+//	Locally, set 'IsLoggedIn'
+//	Tell the server
+//	If the user cannot be found just return (error will already have been signalled)
+//	If the server complains, display an error.
+func Quit(ctx *gin.Context) {
+	utils.Trace(utils.Purple, "Quit was requested\n")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
+	user := userobject.(*models.User)
+	user.IsLocked = false
+	_, err := api.ServerRequest(user.ApiKey, `admin/unlock/`+user.UserName)
+	if err != nil {
+		utils.DisplayError(ctx, fmt.Sprintf("User %s could not quit because the server objected.", user.UserName))
+		ctx.Abort()
+		return
 	}
 
-	AdminDashboard(ctx)
+	// Delete any cookie stil hanging around
+	http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: user.UserName, Path: "/", MaxAge: 0})
+	utils.Trace(utils.BrightMagenta, fmt.Sprintf("%s has quit\n", user.UserName))
+	ctx.Request.URL.Path = `/`
+	Router.HandleContext(ctx)
 }

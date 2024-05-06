@@ -1,0 +1,73 @@
+{{ template "header.html" .}}
+<style>
+  .grid-container {
+    display: grid;
+    grid-template-columns: 30% 30% 40%;    
+  }
+
+  .grid-item {
+    text-align: center;
+    padding: 5px;
+  }
+
+  .ind1 {
+    grid-column: 1 / span 1;
+    grid-row: 1;
+  }
+
+  .ind2 {
+    grid-column: 2;
+    grid-row: 1 / span 1;
+  }
+
+  .ind3 {
+    grid-column: 3 / span 1;
+    grid-row: 1;
+  }
+  .class1 {
+    grid-column: 1 / span 1;
+    grid-row: 2;
+  }
+
+  .class2 {
+    grid-column: 2;
+    grid-row: 2 / span 1;
+  }
+
+  .class3 {
+    grid-column: 3 / span 1;
+    grid-row: 2;
+  }
+
+  .commodities {
+    grid-column: 1 / span 3;
+    grid-row: 3;
+  }
+
+</style>
+
+<div class="grid-container" style="Width:75%;  margin:auto; padding-top:60px;">
+  <div class="grid-item ind1">
+    {{ template "industry-table-sizes.html" .}}
+  </div>
+  <div class="grid-item ind2">
+    {{ template "industry-table-values.html" .}}
+  </div>
+  <div class="grid-item ind3">
+    {{ template "industry-table-prices.html" .}}
+  </div>
+  <div class="grid-item class1">
+    {{ template "class-table-sizes.html" .}}
+  </div>
+  <div class="grid-item class2">
+    {{ template "class-table-values.html" .}}
+  </div>
+  <div class="grid-item class3">
+    {{ template "class-table-prices.html" .}}
+  </div>
+  <div class="grid-item commodities">{{ template "commodity-table.html" .}}</div>
+</div>
+
+
+<!--Embed the footer.html template at this location-->
+{{ template "footer.html" .}}

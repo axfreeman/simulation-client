@@ -1,58 +1,39 @@
 <div class="w3-section w3-card-4 w3-serif">
   <header class="w3-container w3-blue">
-    <h4 class="w3-center"> Prices </h4>
+    <div class="w3-center"> Industry Prices </div>
   </header>
 
-  <table class="table table-striped w-auto"id ="prices">
+  <table>
     <thead>
       <tr>
-        <th style="width:30%">Name</th>
-        <th style="text-align:center; width:15%">C</th>
-        <th style="text-align:center;width:15%">V</th>
-        <th style="text-align:center;width:15%">M</th>
-        <th style="text-align:center;width:15%">C'</th>
-        <th style="text-align:center;width:15%">Initial<br>Capital</th>
-        <th style="text-align:center;width:15%">Current<br>Capital</th>
+        <th style="width:15%">Name</th>
+        <th style="text-align:center; width:10%">C</th>
+        <th style="text-align:center;width:10%">V</th>
+        <th style="text-align:center;width:10%">M</th>
+        <th style="text-align:center;width:10%">C'</th>
+        <th style="text-align:center;width:15%">Initial Capital</th>
+        <th style="text-align:center;width:15%">Current Capital</th>
         <th style="text-align:center;width:15%">Profit</th>
-        <th style="text-align:center;width:15%">Profit<br>Rate</th>
+        <th style="text-align:center;width:15%">Profit Rate</th>
       </tr>
     </thead>
     <tbody>
       <!--Loop over the industries -->
-      {{range .industries }}
+      {{range .industryViews }}
 
       <tr>
         <td style="text-align: left"><a href="/industry/{{.Id}}">{{ .Name }}</a></td>
-        <td style="text-align:center">{{ .ConstantCapital.Price }}</td>
-        <td style="text-align:center">{{ .VariableCapital.Price}}</td>
-        <td style="text-align:center">{{ .MoneyStock.Price}}</td>
-        <td style="text-align:center">{{ .SalesStock.Price}}</td>
-        <td style="text-align:center">{{ .Initial_Capital}}</td>
-        <td style="text-align:center">{{ .Current_Capital}}</td>
-        <td style="text-align:center">{{ .Profit}}</td>
-        <td style="text-align:center">{{ .Profit_Rate}}</td>
+        {{ .ConstantCapitalPrice.DisplayRounded }}
+        {{ .VariableCapitalPrice.DisplayRounded}}
+        {{ .MoneyStockPrice.DisplayRounded}}
+        {{ .SalesStockPrice.DisplayRounded}}
+        {{ .Initial_Capital.DisplayRounded}}
+        {{ .Current_Capital.DisplayRounded}}
+        {{ .Profit.DisplayRounded}}
+        {{ .Profit_Rate.DisplayRounded}}
       </tr>
       {{end}}
     </tbody>
   </table>
 </div>
 
-<script>
-
-  new DataTable('#prices', {
-    info: false,
-    paging: false,
-    filter: false,
-    columns: [
-      null,
-      { orderable: false },
-      { orderable: false },
-      { orderable: false },
-      { orderable: false },
-      { orderable: false },
-      { orderable: false },
-      { orderable: false },
-      { orderable: false },
-    ]
-  });
-</script>

@@ -1,43 +1,28 @@
-<div class="w3-section w3-card-4 w3-serif" style=" margin:auto">
+<div class="w3-section w3-card-4 w3-serif" style="width:75%; margin:auto">
   <header class="w3-container w3-blue">
-    <h4 class="w3-center"> Class Prices </h4>
+    <div class="w3-center"> Social Class Prices <div>
   </header>
 
-  <table class="table table-striped w-auto"id="class-prices">
+  <table >
     <thead>
       <tr>
-        <th>Name</th>
-        <th style="text-align:center">Consumption<br>Goods</th>
-        <th style="text-align:center">Money</th>
-        <th style="text-align:center">For<br>Sale</th>
+        <th style="width:15%">Name</th>
+        <th style="text-align:center; width:10%">Consumption</th>
+        <th style="text-align:center; width:10%">Money</th>
+        <th style="text-align:center; width:10%">Sales</th>
       </tr>
     </thead>
     <tbody>
       <!--Loop over the classes -->
-      {{range .classes }}
+      {{range .classViews }}
 
       <tr>
         <td style="text-align:left"><a href="/class/{{.Id}}">{{ .Name }}</a></td>
-        <td style="text-align:center">{{ .ConsumerGood.Price }}</td>
-        <td style="text-align:right">{{ .MoneyStock.Price }}</td>
-        <td style="text-align:right">{{ .SalesStock.Price }}</td>
+        {{ .ConsumptionStockPrice.DisplayRounded }}
+        {{ .MoneyStockPrice.DisplayRounded }}
+        {{ .SalesStockPrice.DisplayRounded }}
       </tr>
       {{end}}
     </tbody>
   </table>
 </div>
-
-<script>
-
-  new DataTable('#class-prices', {
-    info: false,
-    paging: false,
-    filter: false,
-    columns: [
-      null,
-      { orderable: false },
-      { orderable: false },
-      { orderable: false },
-    ]
-  });
-</script>
