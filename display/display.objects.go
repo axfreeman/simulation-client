@@ -56,7 +56,7 @@ func userStatus(ctx *gin.Context) (string, error) {
 	userDetails, _ := json.MarshalIndent(synched_user, " ", " ")
 	logging.Trace(colour.Yellow, fmt.Sprintf("The server sent this user record: %s\n", string(userDetails)))
 
-	logging.Trace(colour.Green, fmt.Sprintf(
+	logging.Trace(colour.Yellow, fmt.Sprintf(
 		"Client says the current simulation is %d and the server says it is %d\n",
 		models.Users[username].CurrentSimulationID,
 		synched_user.CurrentSimulationID))
@@ -103,7 +103,7 @@ func ShowCommodities(ctx *gin.Context) {
 		return
 	}
 	state := models.Users[username].Get_current_state()
-	logging.Trace(colour.Green, fmt.Sprintf("current state is %s\n", state))
+	logging.Trace(colour.Yellow, fmt.Sprintf("current state is %s\n", state))
 	ctx.HTML(http.StatusOK, "commodities.html", gin.H{
 		"Title":       "Commodities",
 		"commodities": models.Users[username].Commodities(),
@@ -223,7 +223,7 @@ func ShowIndexPage(ctx *gin.Context) {
 	// Uncomment for more detailed diagnostics
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
-		logging.Trace(colour.Cyan, fmt.Sprintf(" ShowIndexPage was called from %s#%d\n", file, no))
+		logging.Trace(colour.Yellow, fmt.Sprintf(" ShowIndexPage was called from %s#%d\n", file, no))
 	}
 	username, err := userStatus(ctx)
 	if err != nil {
@@ -277,7 +277,7 @@ func ShowTrace(ctx *gin.Context) {
 func UserDashboard(ctx *gin.Context) {
 
 	if _, file, no, ok := runtime.Caller(1); ok {
-		logging.Trace(colour.Cyan, fmt.Sprintf(" User Dashboard was called from %s line #%d\n", file, no))
+		logging.Trace(colour.Yellow, fmt.Sprintf(" User Dashboard was called from %s line #%d\n", file, no))
 	}
 
 	username, err := userStatus(ctx)

@@ -82,9 +82,9 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 	// (miss out trace for now - it's too big)
 	for i := 0; i < len(ApiList)-1; i++ {
 		a := ApiList[i]
-		fmt.Printf(" FetchUserObjects is fetching API item %d with name %s from URL %s\n", i, a.Name, a.ApiUrl)
+		logging.Trace(colour.Cyan, fmt.Sprintf(" FetchUserObjects is fetching API item %d with name %s from URL %s\n", i, a.Name, a.ApiUrl))
 		if !FetchAPI(&a, username) {
-			logging.Trace(colour.Red, "There are no object to retrieve from the remote server. Do not continue \n")
+			logging.Trace(colour.Cyan, "There are no objects to retrieve from the remote server. Do not continue \n")
 			return false
 		}
 	}
@@ -92,7 +92,7 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 	// s, _ := json.MarshalIndent(models.Users[username], "  ", "  ")
 	// fmt.Printf("User record after creating the simulation is %s\n", string(s))
 
-	log.Output(1, "Refresh complete")
+	logging.Trace(colour.Cyan, "Refresh complete")
 	return true
 }
 
@@ -132,7 +132,7 @@ func FetchAPI(item *ApiItem, username string) (result bool) {
 	}
 
 	// Populate the user record.
-	fmt.Printf("Unmarshalling data for user %s into %v\n", username, item.Name)
+	logging.Trace(colour.Cyan, fmt.Sprintf("Unmarshalling data for user %s into %v\n", username, item.Name))
 
 	switch item.Name {
 
@@ -151,15 +151,15 @@ func FetchAPI(item *ApiItem, username string) (result bool) {
 	case `trace`:
 		jsonErr = json.Unmarshal(body, &models.Users[username].TraceList)
 	default:
-		log.Output(1, fmt.Sprintf("Unknown dataset%s ", item.Name))
+		logging.Trace(colour.Red, fmt.Sprintf("Unknown dataset%s ", item.Name))
 	}
 
 	if jsonErr != nil {
-		log.Output(1, fmt.Sprintf("Failed to unmarshal template json because: %s", jsonErr))
+		logging.Trace(colour.Red, fmt.Sprintf("Failed to unmarshal template json because: %s", jsonErr))
 		return false
 	}
 
-	fmt.Printf("Data refreshed for user %s\n", username)
+	logging.Trace(colour.Red, fmt.Sprintf("Data refreshed for user %s\n", username))
 	return true
 }
 

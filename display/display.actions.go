@@ -123,7 +123,7 @@ func CreateSimulation(ctx *gin.Context) {
 
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
-		logging.Trace(colour.Cyan, fmt.Sprintf(" Clone Simulation was called from %s#%d\n", file, no))
+		logging.Trace(colour.Green, fmt.Sprintf(" Clone Simulation was called from %s#%d\n", file, no))
 	}
 
 	username := `guest`
@@ -146,7 +146,7 @@ func CreateSimulation(ctx *gin.Context) {
 		return
 	}
 
-	log.Output(1, fmt.Sprintf("Setting current simulation to be %d", result.Simulation_id))
+	logging.Trace(colour.Green, fmt.Sprintf("Setting current simulation to be %d", result.Simulation_id))
 	models.Users[username].CurrentSimulationID = result.Simulation_id
 
 	// Diagnostic - comment or uncomment as needed
