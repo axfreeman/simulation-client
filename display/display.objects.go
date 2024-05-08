@@ -53,13 +53,14 @@ func userStatus(ctx *gin.Context) (string, error) {
 		log.Printf("We couldn't make sense of what the server says about user %s", username)
 		return username, err
 	}
-	userDetails, _ := json.MarshalIndent(synched_user, " ", " ")
-	logging.Trace(colour.Yellow, fmt.Sprintf("The server sent this user record: %s\n", string(userDetails)))
+	// userDetails, _ := json.MarshalIndent(synched_user, " ", " ")
+	// logging.Trace(colour.Yellow, fmt.Sprintf("The server sent this user record: %s\n", string(userDetails)))
 
 	logging.Trace(colour.Yellow, fmt.Sprintf(
-		"Client says the current simulation is %d and the server says it is %d\n",
+		"The server sent a user record which says the current simulation is %d; the client says it is %d\n",
+		synched_user.CurrentSimulationID,
 		models.Users[username].CurrentSimulationID,
-		synched_user.CurrentSimulationID))
+	))
 
 	// Update client data from the server if need be.
 	if models.Users[username].CurrentSimulationID != synched_user.CurrentSimulationID {

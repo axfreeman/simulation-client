@@ -81,7 +81,7 @@ func ServerRequest(username string, description string, relativePath string) ([]
 		return nil, err
 	}
 
-	logging.Trace(colour.Cyan, fmt.Sprintf(" Api key is [%s]\n", user.ApiKey))
+	// logging.Trace(colour.Cyan, fmt.Sprintf(" Api key is [%s]\n", user.ApiKey))
 	resp.Header.Add("Content-Type", "application/json")
 	resp.Header.Set("User-Agent", "Capitalism reader")
 	resp.Header.Add("x-api-key", user.ApiKey)
