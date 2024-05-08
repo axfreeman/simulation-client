@@ -16,7 +16,7 @@ import (
 
 // Display the admin dashboard
 func AdminDashboard(ctx *gin.Context) {
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Could not retrieve Data to delete a simulation ")
 		return

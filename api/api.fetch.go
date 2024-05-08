@@ -28,34 +28,6 @@ type ApiItem struct {
 	ApiUrl string // the url to be used in accessing the backend
 }
 
-// Method of an ApiItem object which wraps the target address
-// for data from the server.
-//
-//	item: provides the url that retrieves this table from the remote server.
-//	username: which user should receive it.
-//
-// Returns nil if the List does not exist.
-// This happens if the user is not currently in the client userList.
-// or if the user has no simulations.
-func (item ApiItem) Target(username string) any {
-
-	// test to see if the user exists
-	u, ok1 := models.Users[username]
-	if !ok1 {
-		fmt.Printf("Target reporting. User %v does not have a local user record", username)
-		return nil
-	}
-
-	fmt.Printf("User %v is in the local database", u)
-
-	// legacy cases which should no longer occur
-	if item.Name == `template` || item.Name == `users` {
-		log.Fatal("Disallowed Legacy use of apiItem.Target")
-	}
-
-	return nil
-}
-
 // a list of items needed to fetch data from the remote server
 var ApiList = [7]ApiItem{
 	{`simulation`, `simulations/`},

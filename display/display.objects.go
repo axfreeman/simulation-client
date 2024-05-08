@@ -24,7 +24,7 @@ import (
 //
 //	Returns the username and any error.
 //	Sets 'LastVisitedPage' so we can return here after an action.
-func userStatus(ctx *gin.Context) (string, error) {
+func synchWithServer(ctx *gin.Context) (string, error) {
 	// Comment for less detailed diagnostics
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
@@ -98,7 +98,7 @@ func set_current_state(username string, new_state string) {
 
 // display all commodities in the current simulation
 func ShowCommodities(ctx *gin.Context) {
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Could not retrieve Commodities ")
 		return
@@ -115,7 +115,7 @@ func ShowCommodities(ctx *gin.Context) {
 
 // display all industries in the current simulation
 func ShowIndustries(ctx *gin.Context) {
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Could not retrieve Industries ")
 		return
@@ -132,7 +132,7 @@ func ShowIndustries(ctx *gin.Context) {
 
 // display all classes in the current simulation
 func ShowClasses(ctx *gin.Context) {
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Could not retrieve Classes ")
 		return
@@ -148,7 +148,7 @@ func ShowClasses(ctx *gin.Context) {
 
 // Display one specific commodity
 func ShowCommodity(ctx *gin.Context) {
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Could not retrieve one Commodity ")
 		return
@@ -172,7 +172,7 @@ func ShowCommodity(ctx *gin.Context) {
 
 // Display one specific industry
 func ShowIndustry(ctx *gin.Context) {
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Could not retrieve one industry ")
 		return
@@ -196,7 +196,7 @@ func ShowIndustry(ctx *gin.Context) {
 
 // Display one specific class
 func ShowClass(ctx *gin.Context) {
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Could not retrieve one class ")
 		return
@@ -226,7 +226,7 @@ func ShowIndexPage(ctx *gin.Context) {
 	if ok {
 		logging.Trace(colour.Yellow, fmt.Sprintf(" ShowIndexPage was called from %s#%d\n", file, no))
 	}
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Problem retrieving index page ")
 		return
@@ -252,7 +252,7 @@ func ShowIndexPage(ctx *gin.Context) {
 
 // Fetch the trace from the local database
 func ShowTrace(ctx *gin.Context) {
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Could not retrieve Trace records ")
 		return
@@ -276,12 +276,11 @@ func ShowTrace(ctx *gin.Context) {
 // Display all templates, and all simulations belonging to this user,
 // in the user dashboard.
 func UserDashboard(ctx *gin.Context) {
-
 	if _, file, no, ok := runtime.Caller(1); ok {
 		logging.Trace(colour.Yellow, fmt.Sprintf(" User Dashboard was called from %s line #%d\n", file, no))
 	}
 
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Could not retrieve data for the user dashboard ")
 		return
@@ -299,19 +298,14 @@ func UserDashboard(ctx *gin.Context) {
 	})
 }
 
-// a diagnostic endpoint to display the data in the system
+// Diagnostic endpoint to display the data in the system.
 func DataHandler(ctx *gin.Context) {
-	// username, loginStatus, _ := userStatus(ctx)
-	// b, err := json.Marshal(models.Users)
-	// if err != nil {
-	// 	fmt.Println("Could not marshal the Users object")
-	// 	return
-	// }
 	ctx.JSON(http.StatusOK, models.Users)
 }
 
+// TODO not working yet
 func SwitchSimulation(ctx *gin.Context) {
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Could not retrieve Data Listing ")
 		return
@@ -324,8 +318,9 @@ func SwitchSimulation(ctx *gin.Context) {
 	})
 }
 
+// TODO not working yet
 func DeleteSimulation(ctx *gin.Context) {
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Could not retrieve Data to delete a simulation ")
 		return
@@ -338,8 +333,9 @@ func DeleteSimulation(ctx *gin.Context) {
 	UserDashboard(ctx)
 }
 
+// TODO not working yet
 func RestartSimulation(ctx *gin.Context) {
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Could not retrieve Data to restart a simulation ")
 		return
@@ -354,7 +350,7 @@ func RestartSimulation(ctx *gin.Context) {
 
 // display all industry stocks in the current simulation
 func ShowIndustryStocks(ctx *gin.Context) {
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Could not retrieve industry Stocks ")
 		return
@@ -376,7 +372,7 @@ func ShowIndustryStocks(ctx *gin.Context) {
 
 // display all the class stocks in the current simulation
 func ShowClassStocks(ctx *gin.Context) {
-	username, err := userStatus(ctx)
+	username, err := synchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, " Could not retrieve Class Stocks ")
 		return

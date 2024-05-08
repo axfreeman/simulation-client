@@ -23,24 +23,43 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Dispatches the action requested in the URL
-// Eg /actions/trade will perform the trade action, and so on.
-type Action struct {
-	A string `uri:"action"`
+// The state which follows each action.
+var nextStates = map[string]string{
+	`demand`:  `SUPPLY`,
+	`supply`:  `TRADE`,
+	`trade`:   `PRODUCE`,
+	`produce`: `CONSUME`,
+	`consume`: `INVEST`,
+	`invest`:  `DEMAND`,
+}
+
+// pages for which redirection is OK.
+func useLastVisited(last string) bool {
+	switch last {
+	case
+		`/commodities`,
+		`/industries`,
+		`/classes`,
+		`/stocks`,
+		`/`:
+		return true
+	}
+	return false
 }
 
 // Handles requests for the server to take an action comprising a stage
 // of the circuit (demand,supply, trade, produce, invest), corresponding
-// to a button press. This is specified by the URL parameter 'act'
+// to a button press. This is specified by the URL parameter 'act'.
+//
 // Having requested the action from ths server, sets 'state' to the next
-// stage of the circuit and redisplays whatever the user was looking at
+// stage of the circuit and redisplays whatever the user was looking at.
 func ActionHandler(ctx *gin.Context) {
-	// Uncomment for more detailed diagnostics
+	// Comment for less detailed diagnostics
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
 		logging.Trace(colour.Purple, fmt.Sprintf(" ActionHandler was called from %s #%d\n", file, no))
 	}
-	var param Action
+	var param string
 	err := ctx.ShouldBindUri(&param)
 	if err != nil {
 		fmt.Println("Malformed URL", err)
@@ -49,12 +68,7 @@ func ActionHandler(ctx *gin.Context) {
 	}
 	act := ctx.Param("action")
 	username := utils.GUESTUSER
-	userDatum, ok := models.Users[username]
-	if !ok {
-		// This can happen if, for example, the user goes for a coffee...
-		utils.DisplayError(ctx, "The server data has changed since you last visited. Please log in again")
-	}
-
+	userDatum := models.Users[username] // NOTE we assume the user exists in local storage
 	lastVisitedPage := userDatum.LastVisitedPage
 	log.Output(1, fmt.Sprintf("User %s wants the server to implement action %s. The last visited page was %s\n", username, act, lastVisitedPage))
 
@@ -68,38 +82,15 @@ func ActionHandler(ctx *gin.Context) {
 		utils.DisplayError(ctx, "The server completed the action but did not send back any data.")
 	}
 
-	// TODO use the state information supplied by the server - this code duplicates the server's prerogative
-	user := models.Users[username]
-	switch act {
-	case "demand":
-		set_current_state(username, "SUPPLY")
-		user.Message = "Demand Complete - watch this space"
-	case "supply":
-		set_current_state(username, "TRADE")
-		user.Message = "Supply Complete - watch this space"
-	case "trade":
-		set_current_state(username, "PRODUCE")
-		user.Message = "Trade Complete - watch this space"
-	case "produce":
-		set_current_state(username, "CONSUME")
-		user.Message = "Production Complete - watch this space"
-	case "consume":
-		set_current_state(username, "INVEST")
-		user.Message = "Consumption Complete - watch this space"
-	case "invest":
-		set_current_state(username, "DEMAND")
-		user.Message = "Investment is not yet coded"
-	default:
-		set_current_state(username, "UNKNOWN")
-		user.Message = "There has been a programme error of some kind"
-	}
+	// Set the state so that the simulation can proceed to the next action.
+	set_current_state(username, nextStates[act])
+
 	// If the user has just visited a page that displays (but does not act!!!!), redirect to it.
 	// If not, redirect to the Index page
 	// This is a very crude mechanism
 	visitedPageURL := strings.Split(lastVisitedPage, "/")
 	log.Output(1, fmt.Sprintf("The last page this user visited was %v and this was split into%v", lastVisitedPage, visitedPageURL))
-	// v := visitedPageURL[0]
-	if lastVisitedPage == `/commodities` || lastVisitedPage == `/industries` || lastVisitedPage == `/classes` || lastVisitedPage == `/stocks` || lastVisitedPage == `/` {
+	if useLastVisited(lastVisitedPage) {
 		logging.Trace(colour.Purple, fmt.Sprintf("User will be redirected to the last visited page which was %s\n", lastVisitedPage))
 		ctx.Request.URL.Path = lastVisitedPage
 		api.Router.HandleContext(ctx)

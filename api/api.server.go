@@ -32,6 +32,7 @@ func Initialise() {
 	if !FetchGlobalObject(utils.APISOURCE+`admin/users`, &models.AdminUserList) {
 		log.Fatal("Could not retrieve user information from the server. Stopping")
 	}
+	// transfer the list to the user map
 	for _, item := range models.AdminUserList {
 		user := models.User{UserName: item.UserName, CurrentSimulationID: item.CurrentSimulationID, ApiKey: item.ApiKey}
 		models.Users[item.UserName] = &user
