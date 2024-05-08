@@ -85,20 +85,19 @@ func ActionHandler(ctx *gin.Context) {
 	// Set the state so that the simulation can proceed to the next action.
 	set_current_state(username, nextStates[act])
 
-	// If the user has just visited a page that displays (but does not act!!!!), redirect to it.
-	// If not, redirect to the Index page
-	// This is a very crude mechanism
+	// If the user was looking at a page that displays (but does not act),
+	// redirect to it so the user can see the result of the action.
+	// If not, redirect to the Index page.
 	visitedPageURL := strings.Split(lastVisitedPage, "/")
 	log.Output(1, fmt.Sprintf("The last page this user visited was %v and this was split into%v", lastVisitedPage, visitedPageURL))
 	if useLastVisited(lastVisitedPage) {
-		logging.Trace(colour.Purple, fmt.Sprintf("User will be redirected to the last visited page which was %s\n", lastVisitedPage))
+		// logging.Trace(colour.Purple, fmt.Sprintf("User will be redirected to the last visited page which was %s\n", lastVisitedPage))
 		ctx.Request.URL.Path = lastVisitedPage
-		api.Router.HandleContext(ctx)
 	} else {
-		logging.Trace(colour.Purple, "User will be redirected to the Index Page, because the last visited URL was not a display page")
+		// logging.Trace(colour.Purple, "User will be redirected to the Index Page, because the last visited URL was not a display page")
 		ctx.Request.URL.Path = "/"
-		api.Router.HandleContext(ctx)
 	}
+	api.Router.HandleContext(ctx)
 }
 
 type CloneResult struct {
@@ -111,13 +110,13 @@ type CloneResult struct {
 // Initially, assume the user is 'guest'.
 // This can be scaled up when and if login is introduced.
 func CreateSimulation(ctx *gin.Context) {
-
+	// Comment for shorter diagnostics
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
 		logging.Trace(colour.Green, fmt.Sprintf(" Clone Simulation was called from %s#%d\n", file, no))
 	}
 
-	username := `guest`
+	username := utils.GUESTUSER
 	t := ctx.Param("id")
 	id, _ := strconv.Atoi(t)
 	log.Output(1, fmt.Sprintf("Creating a simulation from template %d for user %s", id, username))

@@ -45,7 +45,6 @@ var ApiList = [7]ApiItem{
 //
 // Returns: true if all tables succeed.
 func FetchUserObjects(ctx *gin.Context, username string) bool {
-
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
 		logging.Trace(colour.Cyan, fmt.Sprintf(" Fetch user objects was called from %s#%d\n", file, no))
