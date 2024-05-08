@@ -163,15 +163,9 @@ func FetchAPI(item *ApiItem, username string) (result bool) {
 	return true
 }
 
-// Populates one of the two global objects required by the simulation.
-// These are the list of users, and the list of templates.
-//
-//	url: the server endpoint for the desired data.
-//
-//	target: ('users' or 'templates') says where the data should go.
-func FetchAdminObject(url string, target string) bool {
-	var jsonErr error
-
+// Populates an object.
+// Currently used only by Initialise, but could be generalised
+func FetchGlobalObject(url string, target any) bool {
 	resp, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Output(1, fmt.Sprint("Error constructing server request", err))
@@ -190,19 +184,13 @@ func FetchAdminObject(url string, target string) bool {
 		log.Output(1, "Server rejected admin request")
 		return false
 	}
+
 	body_as_string, _ := io.ReadAll(res.Body)
 	defer res.Body.Close()
 
-	if target == `users` {
-		jsonErr = json.Unmarshal(body_as_string, &models.AdminUserList)
-	}
-
-	if target == `templates` {
-		jsonErr = json.Unmarshal(body_as_string, &models.TemplateList)
-	}
-
+	jsonErr := json.Unmarshal(body_as_string, target)
 	if jsonErr != nil {
-		log.Output(1, fmt.Sprint("could not unmarshal the server response:\n", string(body_as_string)))
+		log.Output(1, fmt.Sprint("Could not unmarshal the server response:\n", string(body_as_string)))
 		return false
 	}
 	log.Output(1, fmt.Sprintf("Request for %s data accepted", target))

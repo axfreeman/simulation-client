@@ -29,7 +29,7 @@ var Router *gin.Engine = gin.New()
 // Retrieve users and templates from the server database.
 func Initialise() {
 	// Retrieve users on the server
-	if !FetchAdminObject(utils.APISOURCE+`admin/users`, `users`) {
+	if !FetchGlobalObject(utils.APISOURCE+`admin/users`, &models.AdminUserList) {
 		log.Fatal("Could not retrieve user information from the server. Stopping")
 	}
 	for _, item := range models.AdminUserList {
@@ -38,7 +38,7 @@ func Initialise() {
 	}
 
 	// Retrieve the templates on the server
-	if !FetchAdminObject(utils.APISOURCE+`templates/templates`, `templates`) {
+	if !FetchGlobalObject(utils.APISOURCE+`templates/templates`, &models.TemplateList) {
 		log.Fatal("Could not retrieve templates information from the server. Stopping")
 	}
 }
