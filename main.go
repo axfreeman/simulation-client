@@ -8,37 +8,37 @@ import (
 
 func main() {
 
-	api.Router.LoadHTMLGlob("./templates/**/*") // load the templates
+	display.Router.LoadHTMLGlob("./templates/**/*") // load the templates
 
 	fmt.Println("Welcome to capitalism")
 
-	api.Router.GET("/action/:action", display.ActionHandler)
+	display.Router.GET("/action/:action", display.ActionHandler)
 
-	api.Router.GET("/commodities", display.ShowCommodities)
-	api.Router.GET("/industries", display.ShowIndustries)
-	api.Router.GET("/classes", display.ShowClasses)
-	api.Router.GET("/industry_stocks", display.ShowIndustryStocks)
-	api.Router.GET("/class_stocks", display.ShowClassStocks)
-	api.Router.GET("/trace", display.ShowTrace)
+	display.Router.GET("/commodities", display.ShowCommodities)
+	display.Router.GET("/industries", display.ShowIndustries)
+	display.Router.GET("/classes", display.ShowClasses)
+	display.Router.GET("/industry_stocks", display.ShowIndustryStocks)
+	display.Router.GET("/class_stocks", display.ShowClassStocks)
+	display.Router.GET("/trace", display.ShowTrace)
 
-	api.Router.GET("/industry/:id", display.ShowIndustry)
-	api.Router.GET("/commodity/:id", display.ShowCommodity)
-	api.Router.GET("/class/:id", display.ShowClass)
+	display.Router.GET("/industry/:id", display.ShowIndustry)
+	display.Router.GET("/commodity/:id", display.ShowCommodity)
+	display.Router.GET("/class/:id", display.ShowClass)
 
-	api.Router.GET("/user/create/:id", display.CreateSimulation)
-	api.Router.GET("/user/switch/:id", display.SwitchSimulation)
-	api.Router.GET("/user/delete/:id", display.DeleteSimulation)
-	api.Router.GET("/user/restart/:id", display.RestartSimulation)
+	display.Router.GET("/user/create/:id", display.CreateSimulation)
+	display.Router.GET("/user/switch/:id", display.SwitchSimulation)
+	display.Router.GET("/user/delete/:id", display.DeleteSimulation)
+	display.Router.GET("/user/restart/:id", display.RestartSimulation)
 
-	api.Router.GET("/", display.ShowIndexPage)
-	api.Router.GET("/data/", display.DataHandler)
-	api.Router.GET("/user/dashboard", display.UserDashboard)
-	api.Router.GET("/admin/dashboard", display.AdminDashboard)
-	api.Router.GET("/admin/reset", display.AdminReset)
+	display.Router.GET("/", display.ShowIndexPage)
+	display.Router.GET("/data/", display.DataHandler)
+	display.Router.GET("/user/dashboard", display.UserDashboard)
+	display.Router.GET("/admin/dashboard", display.AdminDashboard)
+	display.Router.GET("/admin/reset", display.AdminReset)
 
 	api.Initialise()
-	api.ListData()
+	display.ListData()
 
-	api.Router.Run() // Run the server
+	display.Router.Run() // Run the server
 
 }

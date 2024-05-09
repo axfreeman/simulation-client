@@ -20,40 +20,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var AccessToken string
-var URLheader string
-
-var Router *gin.Engine = gin.New()
-
-// Runs once at startup.
-// Retrieve users and templates from the server database.
-func Initialise() {
-	// Retrieve users on the server
-	if !FetchGlobalObject(utils.APISOURCE+`admin/users`, &models.AdminUserList) {
-		log.Fatal("Could not retrieve user information from the server. Stopping")
-	}
-	// transfer the list to the user map
-	for _, item := range models.AdminUserList {
-		user := models.User{UserName: item.UserName, CurrentSimulationID: item.CurrentSimulationID, ApiKey: item.ApiKey}
-		models.Users[item.UserName] = &user
-	}
-
-	// Retrieve the templates on the server
-	if !FetchGlobalObject(utils.APISOURCE+`templates/templates`, &models.TemplateList) {
-		log.Fatal("Could not retrieve templates information from the server. Stopping")
-	}
-}
-
-// Helper function to list out users and templates
-func ListData() {
-	fmt.Printf("\nTemplateList has %d elements which are:\n", len(models.TemplateList))
-	for i := 0; i < len(models.TemplateList); i++ {
-		fmt.Println(models.TemplateList[i])
-	}
-	m, _ := json.MarshalIndent(models.Users, " ", " ")
-	fmt.Println(string(m))
-}
-
 // Prepare and send a request for a protected service to the server
 // using the user's api key.
 //
@@ -108,8 +74,6 @@ func ServerRequest(username string, description string, relativePath string) ([]
 
 	return b, nil
 }
-
-var UserMessage string
 
 // Contains the information needed to fetch data for one model from the remote server.
 // Name is a description, just for diagnostic purposes.
@@ -257,4 +221,23 @@ func FetchGlobalObject(url string, target any) bool {
 	}
 	log.Output(1, fmt.Sprintf("Request for %s data accepted", target))
 	return true
+}
+
+// Runs once at startup.
+// Retrieve users and templates from the server database.
+func Initialise() {
+	// Retrieve users on the server
+	if !FetchGlobalObject(utils.APISOURCE+`admin/users`, &models.AdminUserList) {
+		log.Fatal("Could not retrieve user information from the server. Stopping")
+	}
+	// transfer the list to the user map
+	for _, item := range models.AdminUserList {
+		user := models.User{UserName: item.UserName, CurrentSimulationID: item.CurrentSimulationID, ApiKey: item.ApiKey}
+		models.Users[item.UserName] = &user
+	}
+
+	// Retrieve the templates on the server
+	if !FetchGlobalObject(utils.APISOURCE+`templates/templates`, &models.TemplateList) {
+		log.Fatal("Could not retrieve templates information from the server. Stopping")
+	}
 }

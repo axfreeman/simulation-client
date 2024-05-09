@@ -97,7 +97,7 @@ func ActionHandler(ctx *gin.Context) {
 		// logging.Trace(colour.Purple, "User will be redirected to the Index Page, because the last visited URL was not a display page")
 		ctx.Request.URL.Path = "/"
 	}
-	api.Router.HandleContext(ctx)
+	Router.HandleContext(ctx)
 }
 
 type CloneResult struct {
@@ -147,5 +147,5 @@ func CreateSimulation(ctx *gin.Context) {
 		utils.DisplayError(ctx, "WARNING: though the server created a simulation, we could not retrieve all its data")
 	}
 	ctx.Request.URL.Path = "/"
-	api.Router.HandleContext(ctx)
+	Router.HandleContext(ctx)
 }

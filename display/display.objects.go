@@ -19,6 +19,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var Router *gin.Engine = gin.New()
+
 // Helper function for most display handlers. Main purpose is to maintain
 // synchronisation between the data on the server and the local copy.
 //
@@ -77,6 +79,16 @@ func synchWithServer(ctx *gin.Context) (string, error) {
 	models.Users[username].LastVisitedPage = ctx.Request.URL.Path
 	logging.Trace(colour.Yellow, fmt.Sprintf("User %s is good to go\n", username))
 	return username, nil
+}
+
+// Helper function to list out users and templates
+func ListData() {
+	fmt.Printf("\nTemplateList has %d elements which are:\n", len(models.TemplateList))
+	for i := 0; i < len(models.TemplateList); i++ {
+		fmt.Println(models.TemplateList[i])
+	}
+	m, _ := json.MarshalIndent(models.Users, " ", " ")
+	fmt.Println(string(m))
 }
 
 // helper function to obtain the state of the current simulation
@@ -232,9 +244,6 @@ func ShowIndexPage(ctx *gin.Context) {
 		return
 	}
 	state := models.Users[username].Get_current_state()
-
-	api.UserMessage = `This is the home page`
-
 	clist := *models.Users[username].Commodities()
 	ilist := *models.Users[username].Industries()
 	cllist := *models.Users[username].Classes()
