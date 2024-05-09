@@ -20,61 +20,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Prepare and send a request for a protected service to the server
-// using the user's api key.
-//
-//	ctx is the context of a handler.
-//	username is the name of the user requesting the service.
-//	description is a user-friendly name for the requested action.
-//	relativePath is appended to the server URL to tell the server what to do.
-func ServerRequest(username string, description string, relativePath string) ([]byte, error) {
-	_, file, no, ok := runtime.Caller(1)
-	if ok {
-		logging.Trace(colour.Cyan, fmt.Sprintf(" ServerRequest was called from %s#%d\n", file, no))
-		logging.Trace(colour.Cyan, fmt.Sprintf(colour.Cyan+" Username was %s, description %s, relativePath %s, APIURL %s\n"+colour.Reset, username, description, relativePath, utils.APISOURCE))
-	}
-
-	user, ok := models.Users[username]
-	if !ok {
-		return nil, fmt.Errorf(" User %s is not in the local database", username)
-	}
-
-	url := utils.APISOURCE + relativePath
-	body, _ := json.Marshal(models.RequestData{User: username}) // (overkill diagnostic? - not actually needed)
-	resp, err := http.NewRequest("GET", url, bytes.NewBuffer(body))
-
-	if err != nil {
-		log.Output(1, fmt.Sprintf("Error %v for user %s from URL %s for resource %s \n", err, username, url, description))
-		return nil, err
-	}
-
-	// logging.Trace(colour.Cyan, fmt.Sprintf(" Api key is [%s]\n", user.ApiKey))
-	resp.Header.Add("Content-Type", "application/json")
-	resp.Header.Set("User-Agent", "Capitalism reader")
-	resp.Header.Add("x-api-key", user.ApiKey)
-
-	client := &http.Client{Timeout: time.Second * 5} // Timeout after 5 seconds
-	res, _ := client.Do(resp)
-	if res == nil {
-		log.Output(1, "Server is down or misbehaving")
-		return nil, nil
-	}
-
-	defer res.Body.Close()
-	b, _ := io.ReadAll(res.Body)
-
-	if res.StatusCode != 200 {
-		log.Output(1, fmt.Sprintf("Server rejected request '%s' with status %s\n", description, res.Status))
-		logging.Trace(colour.Red, fmt.Sprintf("It said %s\n", string(b)))
-		return nil, fmt.Errorf(string(b))
-	}
-
-	// Comment for fewer diagnostics
-	fmt.Println(colour.Cyan + " Leaving ProtectedServerRequest. Everything seems to have worked." + colour.Reset)
-
-	return b, nil
-}
-
 // Contains the information needed to fetch data for one model from the remote server.
 // Name is a description, just for diagnostic purposes.
 // ApiURL is the endpoint to get the data from the server.
@@ -92,6 +37,79 @@ var ApiList = [7]ApiItem{
 	{`industry_stock`, `stocks/industry`},
 	{`class_stock`, `stocks/class`},
 	{`trace`, `trace/`},
+}
+
+// Defines a data object to be synchronised with the server
+// ApiUrl is the endpoint on the server
+// DataList is the local client storage for the data
+type DataObject struct {
+	ApiUrl   string
+	DataList []any
+}
+
+func (DataObject) Fetch() {
+	// var jsonErr error
+	// body, err := ServerRequest(username, "Fetch Table", item.ApiUrl)
+
+	// if err != nil {
+	// 	log.Output(1, "ERROR: The server did not send a response; this is a programming error")
+	// 	return false
+	// }
+
+	// if len(string(body)) == 0 {
+	// 	log.Output(1, "INFORMATION: The server response was empty")
+	// 	return false
+	// }
+
+	// log.Output(1, fmt.Sprintf("INFORMATION: The server sent a table of length %d\n", len(string(body))))
+
+	// // check for '[]' response (a list with no elements in it)
+	// if body[0] == 91 && body[1] == 93 {
+	// 	log.Output(1, "INFORMATION: The server sent an empty table; this means the user has no simulations yet.")
+	// 	return false
+	// }
+
+	// // Populate the user record.
+	// logging.Trace(colour.Cyan, fmt.Sprintf("Unmarshalling data for user %s into %v\n", username, item.Name))
+}
+
+// Prepare and send a request for a protected service to the server
+// using the user's api key.
+//
+//		apiKey is the key
+//		url is appended to apiSource to tell the server what to do.
+//
+//	 Returns: byte array with the server response
+//	 Returns: error if anything went wrong, or nil
+func ServerRequest(apiKey string, url string) ([]byte, error) {
+	logging.Trace(colour.Cyan, fmt.Sprintf("Entering ServerRequest with apiKey %s and relative path %s\n", apiKey, url))
+	resp, err := http.NewRequest("GET", utils.APISOURCE+url, bytes.NewBuffer([]byte(`{"origin":"Simulation-client"}`)))
+	if err != nil {
+		logging.Trace(colour.Red, "Malformed client request")
+		return nil, err
+	}
+
+	resp.Header.Add("Content-Type", "application/json")
+	resp.Header.Set("User-Agent", "Capitalism reader")
+	resp.Header.Add("x-api-key", apiKey)
+
+	client := &http.Client{Timeout: time.Second * 5} // Timeout after 5 seconds
+	res, _ := client.Do(resp)
+	if res == nil {
+		logging.Trace(colour.Red, "Server is down or misbehaving")
+		return nil, nil
+	}
+
+	defer res.Body.Close()
+	b, _ := io.ReadAll(res.Body)
+
+	if res.StatusCode != 200 {
+		logging.Trace(colour.Red, fmt.Sprintf("Server rejected the request with status %s\n", res.Status))
+		logging.Trace(colour.Red, fmt.Sprintf("It said %s\n", string(b)))
+		return nil, fmt.Errorf(string(b))
+	}
+	logging.Trace(colour.Cyan, "Leaving ServerRequest, everything looks good so far")
+	return b, nil
 }
 
 // Iterates through ApiList to refresh all user objects for one user
@@ -137,7 +155,12 @@ func FetchAPI(item *ApiItem, username string) (result bool) {
 	}
 
 	var jsonErr error
-	body, err := ServerRequest(username, "Fetch Table", item.ApiUrl)
+	user, ok := models.Users[username]
+	if !ok {
+		logging.Trace(colour.Cyan, fmt.Sprintf("User %s is not in the local database\n", username))
+		return false
+	}
+	body, err := ServerRequest(user.ApiKey, item.ApiUrl)
 
 	if err != nil {
 		log.Output(1, "ERROR: The server did not send a response; this is a programming error")

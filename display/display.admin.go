@@ -4,11 +4,8 @@
 package display
 
 import (
-	"capfront/api"
 	"capfront/models"
 	"capfront/utils"
-	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -35,20 +32,6 @@ func AdminDashboard(ctx *gin.Context) {
 
 // Resets the main database
 // Only available to admin
+// TODO not done yet
 func AdminReset(ctx *gin.Context) {
-	username := utils.GUESTUSER
-
-	if username != "admin" {
-		log.Output(1, fmt.Sprintf("User %s tried to reset the database", username))
-
-	}
-
-	_, jsonErr := api.ServerRequest(username, "reset the database", `action/reset`)
-	if jsonErr != nil {
-		log.Output(1, "Reset failed")
-	} else {
-		log.Output(1, "COMPLETE RESET by admin")
-	}
-
-	AdminDashboard(ctx)
 }

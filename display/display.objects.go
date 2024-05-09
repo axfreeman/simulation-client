@@ -35,16 +35,14 @@ func synchWithServer(ctx *gin.Context) (string, error) {
 
 	// find out what the browser knows
 	username := utils.GUESTUSER
-	if models.Users[username].ApiKey == "" {
+	user := models.Users[username]
+	if user.ApiKey == "" {
 		logging.Trace(colour.Red, "ERROR: User has no api key\n")
 		return username, nil
 	}
 
 	// find out what the server knows
-	body, err := api.ServerRequest(
-		username,
-		fmt.Sprintf("Ask the server about user %s", username),
-		`admin/user/`+username)
+	body, err := api.ServerRequest(user.ApiKey, `admin/user/`+username)
 	if err != nil {
 		log.Printf("The server was upset, and replied :%v\n", err)
 		return username, err
@@ -329,32 +327,10 @@ func SwitchSimulation(ctx *gin.Context) {
 
 // TODO not working yet
 func DeleteSimulation(ctx *gin.Context) {
-	username, err := synchWithServer(ctx)
-	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve Data to delete a simulation ")
-		return
-	}
-
-	id, _ := strconv.Atoi(ctx.Param("id"))
-	log.Output(1, fmt.Sprintf("User %s wants to delete simulation %d", username, id))
-	api.ServerRequest(username, "Delete simulation", "simulations/delete/"+ctx.Param("id"))
-	api.FetchUserObjects(ctx, username)
-	UserDashboard(ctx)
 }
 
 // TODO not working yet
 func RestartSimulation(ctx *gin.Context) {
-	username, err := synchWithServer(ctx)
-	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve Data to restart a simulation ")
-		return
-	}
-
-	id, _ := strconv.Atoi(ctx.Param("id"))
-	log.Output(1, fmt.Sprintf("User %s wants to restart simulation %d", username, id))
-	ctx.HTML(http.StatusOK, "notready.html", gin.H{
-		"Title": "Not Ready",
-	})
 }
 
 // display all industry stocks in the current simulation

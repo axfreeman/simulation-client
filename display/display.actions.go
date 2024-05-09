@@ -72,7 +72,7 @@ func ActionHandler(ctx *gin.Context) {
 	lastVisitedPage := userDatum.LastVisitedPage
 	log.Output(1, fmt.Sprintf("User %s wants the server to implement action %s. The last visited page was %s\n", username, act, lastVisitedPage))
 
-	_, err = api.ServerRequest(username, act, `action/`+act)
+	_, err = api.ServerRequest(userDatum.ApiKey, `action/`+act)
 	if err != nil {
 		utils.DisplayError(ctx, "The server could not complete the action")
 	}
@@ -117,12 +117,13 @@ func CreateSimulation(ctx *gin.Context) {
 	}
 
 	username := utils.GUESTUSER
+	user := models.Users[username] // Should we test for non-existing user?
 	t := ctx.Param("id")
 	id, _ := strconv.Atoi(t)
 	log.Output(1, fmt.Sprintf("Creating a simulation from template %d for user %s", id, username))
 
 	// Ask the server to create the clone and tell us the simulation id
-	body, err := api.ServerRequest(username, " create simulation ", `clone/`+t)
+	body, err := api.ServerRequest(user.ApiKey, `clone/`+t)
 	if err != nil {
 		utils.DisplayError(ctx, fmt.Sprintf("Failed to complete clone because of %v", err))
 		return
