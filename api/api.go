@@ -39,40 +39,6 @@ var ApiList = [7]ApiItem{
 	{`trace`, `trace/`},
 }
 
-// Defines a data object to be synchronised with the server
-// ApiUrl is the endpoint on the server
-// DataList is the local client storage for the data
-type DataObject struct {
-	ApiUrl   string
-	DataList []any
-}
-
-func (DataObject) Fetch() {
-	// var jsonErr error
-	// body, err := ServerRequest(username, "Fetch Table", item.ApiUrl)
-
-	// if err != nil {
-	// 	log.Output(1, "ERROR: The server did not send a response; this is a programming error")
-	// 	return false
-	// }
-
-	// if len(string(body)) == 0 {
-	// 	log.Output(1, "INFORMATION: The server response was empty")
-	// 	return false
-	// }
-
-	// log.Output(1, fmt.Sprintf("INFORMATION: The server sent a table of length %d\n", len(string(body))))
-
-	// // check for '[]' response (a list with no elements in it)
-	// if body[0] == 91 && body[1] == 93 {
-	// 	log.Output(1, "INFORMATION: The server sent an empty table; this means the user has no simulations yet.")
-	// 	return false
-	// }
-
-	// // Populate the user record.
-	// logging.Trace(colour.Cyan, fmt.Sprintf("Unmarshalling data for user %s into %v\n", username, item.Name))
-}
-
 // Prepare and send a request for a protected service to the server
 // using the user's api key.
 //

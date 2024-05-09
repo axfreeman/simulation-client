@@ -18,7 +18,6 @@ type User struct {
 	IndustryStockList   []Industry_Stock
 	ClassStockList      []Class_Stock
 	TraceList           []Trace
-	History             []HistoryItem // the history of the current simulation
 }
 
 // Constructor for a standard initial User, containing empty entries.
@@ -30,7 +29,6 @@ func NewUser(username string) User {
 		CurrentSimulationID: 0,
 		LastVisitedPage:     "",
 		ViewedTimeStamp:     0,
-		History:             make([]HistoryItem, 0),
 	}
 	return new_datum
 }
