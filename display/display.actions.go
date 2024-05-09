@@ -9,6 +9,7 @@ package display
 import (
 	"capfront/api"
 	"capfront/colour"
+	"capfront/fetch"
 	"capfront/logging"
 	"capfront/models"
 	"capfront/utils"
@@ -78,7 +79,7 @@ func ActionHandler(ctx *gin.Context) {
 	}
 
 	// The action was taken. Now refresh the data from the server
-	if !api.FetchUserObjects(ctx, username) {
+	if !fetch.FetchUserObjects(ctx, username) {
 		utils.DisplayError(ctx, "The server completed the action but did not send back any data.")
 	}
 
@@ -144,7 +145,7 @@ func CreateSimulation(ctx *gin.Context) {
 	// s, _ := json.MarshalIndent(models.Users[username], "  ", "  ")
 	// fmt.Printf("User record after creating the simulation is %s\n", string(s))
 
-	if !api.FetchUserObjects(ctx, username) {
+	if !fetch.FetchUserObjects(ctx, username) {
 		utils.DisplayError(ctx, "WARNING: though the server created a simulation, we could not retrieve all its data")
 	}
 	ctx.Request.URL.Path = "/"

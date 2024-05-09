@@ -1,8 +1,8 @@
 package main
 
 import (
-	"capfront/api"
 	"capfront/display"
+	"capfront/fetch"
 	"fmt"
 )
 
@@ -36,7 +36,7 @@ func main() {
 	display.Router.GET("/admin/dashboard", display.AdminDashboard)
 	display.Router.GET("/admin/reset", display.AdminReset)
 
-	api.Initialise()
+	fetch.Initialise()
 	display.ListData()
 
 	display.Router.Run() // Run the server

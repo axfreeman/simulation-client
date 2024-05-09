@@ -6,6 +6,7 @@ package display
 import (
 	"capfront/api"
 	"capfront/colour"
+	"capfront/fetch"
 	"capfront/logging"
 	"capfront/models"
 	"capfront/utils"
@@ -68,7 +69,7 @@ func synchWithServer(ctx *gin.Context) (string, error) {
 			synched_user.CurrentSimulationID,
 			models.Users[username].CurrentSimulationID))
 		// Resynchronise
-		if !api.FetchUserObjects(ctx, username) {
+		if !fetch.FetchUserObjects(ctx, username) {
 			logging.Trace(colour.Red, fmt.Sprintf("ERROR: Could not retrieve data for user %s\n", username))
 			return username, nil
 		}
