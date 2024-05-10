@@ -17,7 +17,7 @@ type DataObject struct {
 	DataList any
 }
 
-func (d DataObject) Fetch() bool {
+func (d *DataObject) Fetch() bool {
 	body, err := ServerRequest(d.ApiKey, d.ApiUrl)
 
 	if err != nil {
@@ -45,5 +45,7 @@ func (d DataObject) Fetch() bool {
 		logging.Trace(utils.Cyan, fmt.Sprintf("Server response could not be unmarshalled: it produced the error %v\n", jsonErr))
 		return false
 	}
+	logging.Trace(utils.Cyan, "Server response was unmarshalled")
+	fmt.Println(d.DataList)
 	return true
 }

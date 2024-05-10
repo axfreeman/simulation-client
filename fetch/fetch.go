@@ -41,6 +41,7 @@ var ApiList = [7]ApiItem{
 //
 // Returns: true if all tables succeed.
 func FetchUserObjects(ctx *gin.Context, username string) bool {
+	// Comment for shorter diagnostics
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
 		logging.Trace(utils.Cyan, fmt.Sprintf(" Fetch user objects was called from %s#%d\n", file, no))
@@ -55,9 +56,15 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 			return false
 		}
 	}
+
+	user := models.Users[username]
+	logging.Trace(utils.Cyan, "Testing Sim")
+	ok = user.Sim.Fetch()
+	logging.Trace(utils.Cyan, fmt.Sprintf("Tested Sim and the result was %v\n", ok))
+
 	// Comment for shorter diagnostics
-	// s, _ := json.MarshalIndent(models.Users[username], "  ", "  ")
-	// fmt.Printf("User record after creating the simulation is %s\n", string(s))
+	s, _ := json.MarshalIndent(models.Users[username], "  ", "  ")
+	fmt.Printf("User record after creating the simulation is %s\n", string(s))
 
 	logging.Trace(utils.Cyan, "Refresh complete")
 	return true

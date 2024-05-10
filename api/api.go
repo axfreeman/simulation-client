@@ -48,6 +48,6 @@ func ServerRequest(apiKey string, url string) ([]byte, error) {
 		logging.Trace(utils.Red, fmt.Sprintf("It said %s\n", string(b)))
 		return nil, fmt.Errorf(string(b))
 	}
-	logging.Trace(utils.Cyan, "Leaving ServerRequest, everything looks good so far")
+	logging.Trace(utils.Cyan, "Leaving ServerRequest, everything looks good so far\n")
 	return b, nil
 }
