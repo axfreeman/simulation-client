@@ -15,7 +15,7 @@ import (
 type DataObject struct {
 	ApiUrl   string
 	ApiKey   string
-	DataList []any
+	DataList any
 }
 
 func (d DataObject) Fetch() bool {

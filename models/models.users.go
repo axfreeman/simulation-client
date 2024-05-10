@@ -3,6 +3,8 @@
 
 package models
 
+import "capfront/data"
+
 // Full details of a user.
 type User struct {
 	UserName            string `json:"username"`              // Repeats the key in the map,for ease of use
@@ -11,6 +13,7 @@ type User struct {
 	Message             string // store for messages to be displayed to the user when appropriate
 	LastVisitedPage     string // Remember what the user was looking at (used when an action is requested)
 	ViewedTimeStamp     int    // Indexes the History field. Selects what the user is viewing
+	Sim                 data.DataObject
 	SimulationList      []Simulation
 	CommodityList       []Commodity
 	IndustryList        []Industry
@@ -22,15 +25,20 @@ type User struct {
 
 // Constructor for a standard initial User, containing empty entries.
 // for fields to be populated from the server.
-func NewUser(username string) User {
-	new_datum := User{
+func NewUser(username string, current_simulation_id int, apiKey string) User {
+	new_user := User{
 		UserName:            username,
-		ApiKey:              "",
-		CurrentSimulationID: 0,
+		ApiKey:              apiKey,
+		CurrentSimulationID: current_simulation_id,
 		LastVisitedPage:     "",
 		ViewedTimeStamp:     0,
+		Sim: data.DataObject{
+			ApiUrl:   `simulations/current`,
+			ApiKey:   apiKey,
+			DataList: make([]Simulation, 0),
+		},
 	}
-	return new_datum
+	return new_user
 }
 
 // Wrappers for the various lists.

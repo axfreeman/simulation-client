@@ -48,7 +48,7 @@ func synchWithServer(ctx *gin.Context) (string, error) {
 		log.Printf("The server was upset, and replied :%v\n", err)
 		return username, err
 	}
-	synched_user := models.NewUser(username)  // Isolated user record, not added to the list of users.
+	synched_user := new(models.User)          // Isolated user record, not added to the list of users.
 	err = json.Unmarshal(body, &synched_user) // it's only there as a receptacle for the server data.
 	if err != nil {
 		log.Printf("We couldn't make sense of what the server says about user %s", username)
@@ -86,15 +86,22 @@ func ListData() {
 	for i := 0; i < len(models.TemplateList); i++ {
 		fmt.Println(models.TemplateList[i])
 	}
+
+	fmt.Printf("\nAdminUserList has %d elements which are:\n", len(models.AdminUserList))
+	for i := 0; i < len(models.AdminUserList); i++ {
+		fmt.Println(models.AdminUserList[i])
+	}
+
+	fmt.Println("\nUsers", len(models.Users))
 	m, _ := json.MarshalIndent(models.Users, " ", " ")
 	fmt.Println(string(m))
+
 }
 
 // helper function to obtain the state of the current simulation
 // to be replaced by inline call
 func Get_current_state(username string) string {
 	return models.Users[username].Get_current_state()
-
 }
 
 // helper function to set the state of the current simulation.

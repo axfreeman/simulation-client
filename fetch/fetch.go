@@ -166,25 +166,27 @@ func FetchGlobalObject(url string, target any) bool {
 		log.Output(1, fmt.Sprint("Could not unmarshal the server response:\n", string(body_as_string)))
 		return false
 	}
-	log.Output(1, fmt.Sprintf("Request for %s data accepted", target))
+	log.Output(1, "Request for server data accepted")
 	return true
 }
 
 // Runs once at startup.
 // Retrieve users and templates from the server database.
 func Initialise() {
-	// Retrieve users on the server
-	if !FetchGlobalObject(utils.APISOURCE+`admin/users`, &models.AdminUserList) {
-		log.Fatal("Could not retrieve user information from the server. Stopping")
-	}
-	// transfer the list to the user map
-	for _, item := range models.AdminUserList {
-		user := models.User{UserName: item.UserName, CurrentSimulationID: item.CurrentSimulationID, ApiKey: item.ApiKey}
-		models.Users[item.UserName] = &user
-	}
-
 	// Retrieve the templates on the server
 	if !FetchGlobalObject(utils.APISOURCE+`templates/templates`, &models.TemplateList) {
 		log.Fatal("Could not retrieve templates information from the server. Stopping")
 	}
+
+	// Retrieve users on the server
+	if !FetchGlobalObject(utils.APISOURCE+`admin/users`, &models.AdminUserList) {
+		log.Fatal("Could not retrieve user information from the server. Stopping")
+	}
+
+	// transfer the list to the user map
+	for _, item := range models.AdminUserList {
+		user := models.NewUser(item.UserName, item.CurrentSimulationID, item.ApiKey)
+		models.Users[item.UserName] = &user
+	}
+
 }
