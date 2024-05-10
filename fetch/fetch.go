@@ -23,34 +23,12 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 	if !user.Sim.Fetch() {
 		utils.Trace(utils.Red, "Sim did not fetch\n")
 	}
-	if !user.Com.Fetch() {
-		utils.Trace(utils.Red, "Com did not fetch\n")
-	}
-	if !user.Ind.Fetch() {
-		utils.Trace(utils.Red, "Ind did not fetch\n")
-	}
-	if !user.Cla.Fetch() {
-		utils.Trace(utils.Red, "Cla did not fetch\n")
-	}
-	if !user.Isl.Fetch() {
-		utils.Trace(utils.Red, "Isl did not fetch\n")
-	}
-	if !user.Csl.Fetch() {
-		utils.Trace(utils.Red, "Csl did not fetch\n")
-	}
-	if !user.Tra.Fetch() {
-		utils.Trace(utils.Red, "Tra did not fetch\n")
-	}
-
 	for key, value := range user.Dataset {
 		fmt.Println("Processing", key)
 		if !value.Fetch() {
 			utils.Trace(utils.Red, "Something went wrong\n")
 		}
 	}
-	// Comment for shorter diagnostics
-	// s, _ := json.MarshalIndent(models.Users[username], "  ", "  ")
-	// fmt.Printf("User record after creating the simulation is %s\n", string(s))
 
 	utils.Trace(utils.Cyan, "Refresh complete\n")
 	return true

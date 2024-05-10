@@ -15,16 +15,51 @@ type User struct {
 	ViewedTimeStamp     int    // Indexes the History field. Selects what the user is viewing
 	Dataset             map[string]api.DataObject
 	Sim                 api.DataObject
-	Com                 api.DataObject
-	Ind                 api.DataObject
-	Cla                 api.DataObject
-	Isl                 api.DataObject
-	Csl                 api.DataObject
-	Tra                 api.DataObject
 }
 
-// Constructor for a standard initial User, containing empty entries.
-// for fields to be populated from the server.
+// Constructor for a dataset object.
+// Contains and defines all the standard objects of a simulation.
+func NewDataset(apiKey string) map[string]api.DataObject {
+	return map[string]api.DataObject{
+		"simulations": {
+			ApiUrl:   `simulations/current`,
+			ApiKey:   apiKey,
+			DataList: new([]Simulation),
+		},
+		"commodities": {
+			ApiUrl:   `commodity`,
+			ApiKey:   apiKey,
+			DataList: new([]Commodity),
+		},
+		"industries": {
+			ApiUrl:   `industry`,
+			ApiKey:   apiKey,
+			DataList: new([]Industry),
+		},
+		"classes": {
+			ApiUrl:   `classes`,
+			ApiKey:   apiKey,
+			DataList: new([]Class),
+		},
+		"industry stocks": {
+			ApiUrl:   `stocks/industry`,
+			ApiKey:   apiKey,
+			DataList: new([]Industry_Stock),
+		},
+		"class stocks": {
+			ApiUrl:   `stocks/class`,
+			ApiKey:   apiKey,
+			DataList: new([]Class_Stock),
+		},
+		"trace": {
+			ApiUrl:   `trace`,
+			ApiKey:   apiKey,
+			DataList: new([]Trace),
+		},
+	}
+}
+
+// Constructor for a standard initial User.
 func NewUser(username string, current_simulation_id int, apiKey string) User {
 	new_user := User{
 		UserName:            username,
@@ -37,80 +72,14 @@ func NewUser(username string, current_simulation_id int, apiKey string) User {
 			ApiKey:   apiKey,
 			DataList: new([]Simulation),
 		},
-		Com: api.DataObject{
-			ApiUrl:   `commodity`,
-			ApiKey:   apiKey,
-			DataList: new([]Commodity),
-		},
-		Ind: api.DataObject{
-			ApiUrl:   `industry`,
-			ApiKey:   apiKey,
-			DataList: new([]Industry),
-		},
-		Cla: api.DataObject{
-			ApiUrl:   `classes`,
-			ApiKey:   apiKey,
-			DataList: new([]Class),
-		},
-		Isl: api.DataObject{
-			ApiUrl:   `stocks/industry`,
-			ApiKey:   apiKey,
-			DataList: new([]Industry_Stock),
-		},
-		Csl: api.DataObject{
-			ApiUrl:   `stocks/class`,
-			ApiKey:   apiKey,
-			DataList: new([]Class_Stock),
-		},
-		Tra: api.DataObject{
-			ApiUrl:   `trace`,
-			ApiKey:   apiKey,
-			DataList: new([]Trace),
-		},
-		Dataset: map[string]api.DataObject{
-			"simulations": {
-				ApiUrl:   `simulations/current`,
-				ApiKey:   apiKey,
-				DataList: new([]Simulation),
-			},
-			"commodities": {
-				ApiUrl:   `commodity`,
-				ApiKey:   apiKey,
-				DataList: new([]Commodity),
-			},
-			"industries": {
-				ApiUrl:   `industry`,
-				ApiKey:   apiKey,
-				DataList: new([]Industry),
-			},
-			"classes": {
-				ApiUrl:   `classes`,
-				ApiKey:   apiKey,
-				DataList: new([]Class),
-			},
-			"industry stocks": {
-				ApiUrl:   `stocks/industry`,
-				ApiKey:   apiKey,
-				DataList: new([]Industry_Stock),
-			},
-			"class stocks": {
-				ApiUrl:   `stocks/class`,
-				ApiKey:   apiKey,
-				DataList: new([]Class_Stock),
-			},
-			"trace": {
-				ApiUrl:   `trace`,
-				ApiKey:   apiKey,
-				DataList: new([]Trace),
-			},
-		},
+		Dataset: NewDataset(apiKey),
 	}
 	return new_user
 }
 
 // Wrappers for the various lists.
 
-// Special case, because the dashboard displays a list of the user's
+// Simulations is a special case, because the dashboard displays a list of user
 // simulations. If the user has none we make up a fake list with nothing
 // in it, to ensure the app does not crash when displaying the dashboard.
 func (u User) Simulations() *[]Simulation {
@@ -147,13 +116,6 @@ func (u User) ClassStocks() *[]Class_Stock {
 // Wrapper for the TraceList
 func (u User) Traces() *[]Trace {
 	return u.Dataset["trace"].DataList.(*[]Trace)
-}
-
-// Format of responses from the server for post requests
-// Specifically (so far), login or register.
-type ServerMessage struct {
-	Message    string `json:"message"`
-	StatusCode int    `json:"statusCode"`
 }
 
 // contains the details of every user's simulations and their status, accessed by username
