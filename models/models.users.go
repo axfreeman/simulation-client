@@ -14,13 +14,12 @@ type User struct {
 	LastVisitedPage     string // Remember what the user was looking at (used when an action is requested)
 	ViewedTimeStamp     int    // Indexes the History field. Selects what the user is viewing
 	Sim                 api.DataObject
-	SimulationList      []Simulation
-	CommodityList       []Commodity
-	IndustryList        []Industry
-	ClassList           []Class
-	IndustryStockList   []Industry_Stock
-	ClassStockList      []Class_Stock
-	TraceList           []Trace
+	Com                 api.DataObject
+	Ind                 api.DataObject
+	Cla                 api.DataObject
+	Isl                 api.DataObject
+	Csl                 api.DataObject
+	Tra                 api.DataObject
 }
 
 // Constructor for a standard initial User, containing empty entries.
@@ -35,7 +34,37 @@ func NewUser(username string, current_simulation_id int, apiKey string) User {
 		Sim: api.DataObject{
 			ApiUrl:   `simulations/current`,
 			ApiKey:   apiKey,
-			DataList: make([]Simulation, 0),
+			DataList: new([]Simulation),
+		},
+		Com: api.DataObject{
+			ApiUrl:   `commodity`,
+			ApiKey:   apiKey,
+			DataList: new([]Commodity),
+		},
+		Ind: api.DataObject{
+			ApiUrl:   `industry`,
+			ApiKey:   apiKey,
+			DataList: new([]Industry),
+		},
+		Cla: api.DataObject{
+			ApiUrl:   `classes`,
+			ApiKey:   apiKey,
+			DataList: new([]Class),
+		},
+		Isl: api.DataObject{
+			ApiUrl:   `stocks/industry`,
+			ApiKey:   apiKey,
+			DataList: new([]Industry_Stock),
+		},
+		Csl: api.DataObject{
+			ApiUrl:   `stocks/class`,
+			ApiKey:   apiKey,
+			DataList: new([]Class_Stock),
+		},
+		Tra: api.DataObject{
+			ApiUrl:   `trace`,
+			ApiKey:   apiKey,
+			DataList: new([]Trace),
 		},
 	}
 	return new_user
@@ -50,41 +79,42 @@ func NewUser(username string, current_simulation_id int, apiKey string) User {
 // make up a fake list with nothing in it, to ensure the app does not
 // crash when displaying the dashboard.
 func (u User) Simulations() *[]Simulation {
-	if len(u.SimulationList) == 0 {
-		var fakeList []Simulation = make([]Simulation, 0)
+	list := u.Sim.DataList.(*[]Simulation)
+	if len(*list) == 0 {
+		var fakeList []Simulation = *new([]Simulation)
 		return &fakeList
 	}
-	return &u.SimulationList
+	return list
 }
 
 // Wrapper for the CommodityList
 func (u User) Commodities() *[]Commodity {
-	return &u.CommodityList
+	return u.Com.DataList.(*[]Commodity)
 }
 
 // Wrapper for the IndustryList
 func (u User) Industries() *[]Industry {
-	return &u.IndustryList
+	return u.Ind.DataList.(*[]Industry)
 }
 
 // Wrapper for the ClassList
 func (u User) Classes() *[]Class {
-	return &u.ClassList
+	return u.Cla.DataList.(*[]Class)
 }
 
 // Wrapper for the IndustryStockList
 func (u User) IndustryStocks() *[]Industry_Stock {
-	return &u.IndustryStockList
+	return u.Isl.DataList.(*[]Industry_Stock)
 }
 
 // Wrapper for the ClassStockList
 func (u User) ClassStocks() *[]Class_Stock {
-	return &u.ClassStockList
+	return u.Csl.DataList.(*[]Class_Stock)
 }
 
 // Wrapper for the TraceList
 func (u User) Traces() *[]Trace {
-	return &u.TraceList
+	return u.Tra.DataList.(*[]Trace)
 }
 
 // Format of responses from the server for post requests

@@ -13,7 +13,7 @@ import (
 type DataObject struct {
 	ApiUrl   string
 	ApiKey   string
-	DataList any
+	DataList interface{}
 }
 
 func (d *DataObject) Fetch() bool {
@@ -37,14 +37,12 @@ func (d *DataObject) Fetch() bool {
 		return false
 	}
 
-	// Populate the data object.
-	utils.Trace(utils.Cyan, fmt.Sprintf("Unmarshalling data %s\n", string(body)))
+	// Populate the data object
 	jsonErr := json.Unmarshal(body, &d.DataList)
 	if jsonErr != nil {
 		utils.Trace(utils.Cyan, fmt.Sprintf("Server response could not be unmarshalled: it produced the error %v\n", jsonErr))
 		return false
 	}
-	utils.Trace(utils.Cyan, "Server response was unmarshalled")
-	fmt.Println(d.DataList)
+	utils.Trace(utils.Cyan, "Server response was unmarshalled\n")
 	return true
 }

@@ -116,14 +116,14 @@ func set_current_state(username string, new_state string) {
 func ShowCommodities(ctx *gin.Context) {
 	username, err := synchWithServer(ctx)
 	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve Commodities ")
+		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display Commodities")
 		return
 	}
-	state := models.Users[username].Get_current_state()
-	utils.Trace(utils.Yellow, fmt.Sprintf("current state is %s\n", state))
+	user := models.Users[username]
+	state := user.Get_current_state()
 	ctx.HTML(http.StatusOK, "commodities.html", gin.H{
 		"Title":       "Commodities",
-		"commodities": models.Users[username].Commodities(),
+		"commodities": user.Commodities(),
 		"username":    username,
 		"state":       state,
 	})

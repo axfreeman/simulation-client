@@ -1,7 +1,6 @@
 package fetch
 
 import (
-	"capfront/api"
 	"capfront/models"
 	"capfront/utils"
 	"encoding/json"
@@ -15,25 +14,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Contains the information needed to fetch data for one model from the remote server.
-// Name is a description, just for diagnostic purposes.
-// ApiURL is the endpoint to get the data from the server.
-type ApiItem struct {
-	Name   string // the data to be obtained
-	ApiUrl string // the url to be used in accessing the backend
-}
-
-// a list of items needed to fetch data from the remote server
-var ApiList = [7]ApiItem{
-	{`simulation`, `simulations/`},
-	{`commodity`, `commodity/`},
-	{`industry`, `industry/`},
-	{`class`, `classes/`},
-	{`industry_stock`, `stocks/industry`},
-	{`class_stock`, `stocks/class`},
-	{`trace`, `trace/`},
-}
-
 // Iterates through ApiList to refresh all user objects for one user
 //
 // Returns: false if any table fails.
@@ -46,98 +26,35 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 		utils.Trace(utils.Cyan, fmt.Sprintf(" Fetch user objects was called from %s#%d\n", file, no))
 	}
 
-	// (miss out trace for now - it's too big)
-	for i := 0; i < len(ApiList)-1; i++ {
-		a := ApiList[i]
-		utils.Trace(utils.Cyan, fmt.Sprintf(" FetchUserObjects is fetching API item %d with name %s from URL %s\n", i, a.Name, a.ApiUrl))
-		if !FetchAPI(&a, username) {
-			utils.Trace(utils.Cyan, "There are no objects to retrieve from the remote server. Do not continue \n")
-			return false
-		}
-	}
-
 	user := models.Users[username]
-	utils.Trace(utils.Cyan, "Testing Sim")
-	ok = user.Sim.Fetch()
-	utils.Trace(utils.Cyan, fmt.Sprintf("Tested Sim and the result was %v\n", ok))
+	utils.Trace(utils.Cyan, "Testing Data Objects")
+	if !user.Sim.Fetch() {
+		utils.Trace(utils.Cyan, "Sim did not fetch\n")
+	}
+	if !user.Com.Fetch() {
+		utils.Trace(utils.Cyan, "Com did not fetch\n")
+	}
+	if !user.Ind.Fetch() {
+		utils.Trace(utils.Cyan, "Ind did not fetch\n")
+	}
+	if !user.Cla.Fetch() {
+		utils.Trace(utils.Cyan, "Cla did not fetch\n")
+	}
+	if !user.Isl.Fetch() {
+		utils.Trace(utils.Cyan, "Isl did not fetch\n")
+	}
+	if !user.Csl.Fetch() {
+		utils.Trace(utils.Cyan, "Csl did not fetch\n")
+	}
+	if !user.Tra.Fetch() {
+		utils.Trace(utils.Cyan, "Tra did not fetch\n")
+	}
 
 	// Comment for shorter diagnostics
-	s, _ := json.MarshalIndent(models.Users[username], "  ", "  ")
-	fmt.Printf("User record after creating the simulation is %s\n", string(s))
+	// s, _ := json.MarshalIndent(models.Users[username], "  ", "  ")
+	// fmt.Printf("User record after creating the simulation is %s\n", string(s))
 
-	utils.Trace(utils.Cyan, "Refresh complete")
-	return true
-}
-
-// Fetch the data specified by item for user.
-//
-//	 item: specifies what is to be retrieved, using which URL
-//	 username: the name of the user - serves as an index into the Users map.
-//
-//		if we got something, return true.
-//		if not, for whatever reason, return false.
-func FetchAPI(item *ApiItem, username string) (result bool) {
-	_, file, no, ok := runtime.Caller(1)
-	if ok {
-		utils.Trace(utils.Cyan, fmt.Sprintf("fetch API was called from %s#%d\n", file, no))
-		log.Output(1, fmt.Sprintf("User %s asked to fetch the table named %s from the URL %s\n", username, item.Name, item.ApiUrl))
-	}
-
-	var jsonErr error
-	user, ok := models.Users[username]
-	if !ok {
-		utils.Trace(utils.Cyan, fmt.Sprintf("User %s is not in the local database\n", username))
-		return false
-	}
-	body, err := api.ServerRequest(user.ApiKey, item.ApiUrl)
-
-	if err != nil {
-		log.Output(1, "ERROR: The server did not send a response; this is a programming error")
-		return false
-	}
-
-	if len(string(body)) == 0 {
-		log.Output(1, "INFORMATION: The server response was empty")
-		return false
-	}
-
-	log.Output(1, fmt.Sprintf("INFORMATION: The server sent a table of length %d\n", len(string(body))))
-
-	// check for '[]' response (a list with no elements in it)
-	if body[0] == 91 && body[1] == 93 {
-		log.Output(1, "INFORMATION: The server sent an empty table; this means the user has no simulations yet.")
-		return false
-	}
-
-	// Populate the user record.
-	utils.Trace(utils.Cyan, fmt.Sprintf("Unmarshalling data for user %s into %v\n", username, item.Name))
-
-	switch item.Name {
-
-	case `simulation`:
-		jsonErr = json.Unmarshal(body, &models.Users[username].SimulationList)
-	case `commodity`:
-		jsonErr = json.Unmarshal(body, &models.Users[username].CommodityList)
-	case `industry`:
-		jsonErr = json.Unmarshal(body, &models.Users[username].IndustryList)
-	case `class`:
-		jsonErr = json.Unmarshal(body, &models.Users[username].ClassList)
-	case `industry_stock`:
-		jsonErr = json.Unmarshal(body, &models.Users[username].IndustryStockList)
-	case `class_stock`:
-		jsonErr = json.Unmarshal(body, &models.Users[username].ClassStockList)
-	case `trace`:
-		jsonErr = json.Unmarshal(body, &models.Users[username].TraceList)
-	default:
-		utils.Trace(utils.Red, fmt.Sprintf("Unknown dataset%s ", item.Name))
-	}
-
-	if jsonErr != nil {
-		utils.Trace(utils.Red, fmt.Sprintf("Failed to unmarshal template json because: %s", jsonErr))
-		return false
-	}
-
-	utils.Trace(utils.Red, fmt.Sprintf("Data refreshed for user %s\n", username))
+	utils.Trace(utils.Cyan, "Refresh complete\n")
 	return true
 }
 
