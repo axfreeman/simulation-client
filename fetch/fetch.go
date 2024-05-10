@@ -2,7 +2,6 @@ package fetch
 
 import (
 	"capfront/api"
-	"capfront/colour"
 	"capfront/logging"
 	"capfront/models"
 	"capfront/utils"
@@ -44,15 +43,15 @@ var ApiList = [7]ApiItem{
 func FetchUserObjects(ctx *gin.Context, username string) bool {
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
-		logging.Trace(colour.Cyan, fmt.Sprintf(" Fetch user objects was called from %s#%d\n", file, no))
+		logging.Trace(utils.Cyan, fmt.Sprintf(" Fetch user objects was called from %s#%d\n", file, no))
 	}
 
 	// (miss out trace for now - it's too big)
 	for i := 0; i < len(ApiList)-1; i++ {
 		a := ApiList[i]
-		logging.Trace(colour.Cyan, fmt.Sprintf(" FetchUserObjects is fetching API item %d with name %s from URL %s\n", i, a.Name, a.ApiUrl))
+		logging.Trace(utils.Cyan, fmt.Sprintf(" FetchUserObjects is fetching API item %d with name %s from URL %s\n", i, a.Name, a.ApiUrl))
 		if !FetchAPI(&a, username) {
-			logging.Trace(colour.Cyan, "There are no objects to retrieve from the remote server. Do not continue \n")
+			logging.Trace(utils.Cyan, "There are no objects to retrieve from the remote server. Do not continue \n")
 			return false
 		}
 	}
@@ -60,7 +59,7 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 	// s, _ := json.MarshalIndent(models.Users[username], "  ", "  ")
 	// fmt.Printf("User record after creating the simulation is %s\n", string(s))
 
-	logging.Trace(colour.Cyan, "Refresh complete")
+	logging.Trace(utils.Cyan, "Refresh complete")
 	return true
 }
 
@@ -74,14 +73,14 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 func FetchAPI(item *ApiItem, username string) (result bool) {
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
-		logging.Trace(colour.Cyan, fmt.Sprintf("fetch API was called from %s#%d\n", file, no))
+		logging.Trace(utils.Cyan, fmt.Sprintf("fetch API was called from %s#%d\n", file, no))
 		log.Output(1, fmt.Sprintf("User %s asked to fetch the table named %s from the URL %s\n", username, item.Name, item.ApiUrl))
 	}
 
 	var jsonErr error
 	user, ok := models.Users[username]
 	if !ok {
-		logging.Trace(colour.Cyan, fmt.Sprintf("User %s is not in the local database\n", username))
+		logging.Trace(utils.Cyan, fmt.Sprintf("User %s is not in the local database\n", username))
 		return false
 	}
 	body, err := api.ServerRequest(user.ApiKey, item.ApiUrl)
@@ -105,7 +104,7 @@ func FetchAPI(item *ApiItem, username string) (result bool) {
 	}
 
 	// Populate the user record.
-	logging.Trace(colour.Cyan, fmt.Sprintf("Unmarshalling data for user %s into %v\n", username, item.Name))
+	logging.Trace(utils.Cyan, fmt.Sprintf("Unmarshalling data for user %s into %v\n", username, item.Name))
 
 	switch item.Name {
 
@@ -124,15 +123,15 @@ func FetchAPI(item *ApiItem, username string) (result bool) {
 	case `trace`:
 		jsonErr = json.Unmarshal(body, &models.Users[username].TraceList)
 	default:
-		logging.Trace(colour.Red, fmt.Sprintf("Unknown dataset%s ", item.Name))
+		logging.Trace(utils.Red, fmt.Sprintf("Unknown dataset%s ", item.Name))
 	}
 
 	if jsonErr != nil {
-		logging.Trace(colour.Red, fmt.Sprintf("Failed to unmarshal template json because: %s", jsonErr))
+		logging.Trace(utils.Red, fmt.Sprintf("Failed to unmarshal template json because: %s", jsonErr))
 		return false
 	}
 
-	logging.Trace(colour.Red, fmt.Sprintf("Data refreshed for user %s\n", username))
+	logging.Trace(utils.Red, fmt.Sprintf("Data refreshed for user %s\n", username))
 	return true
 }
 

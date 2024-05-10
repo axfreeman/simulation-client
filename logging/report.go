@@ -6,7 +6,7 @@
 package logging
 
 import (
-	"capfront/colour"
+	"capfront/utils"
 	"fmt"
 )
 
@@ -20,5 +20,5 @@ func Trace(startColour string, message string) {
 	if !TraceLevel {
 		return
 	}
-	fmt.Print(startColour + message + colour.Reset)
+	fmt.Print(startColour + message + utils.Reset)
 }
