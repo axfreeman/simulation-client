@@ -46,21 +46,6 @@ type Simulation struct {
 	User                   int32   `json:"user_id"`
 }
 
-// {
-//   "id": 9,
-//   "name": "Simple Reproduction",
-//   "time_stamp": 0,
-//   "username": "guest",
-//   "state": "DEMAND",
-//   "periods_per_year": 1.0,
-//   "population_growth_rate": 1.0,
-//   "investment_ratio": 1.0,
-//   "currency_symbol": "$",
-//   "quantity_symbol": "#",
-//   "melt": 1.0
-// }
-
-// for example means of production, labour power, consumption goods, money, etc
 type Commodity struct {
 	Id                          int    `json:"id"`
 	Name                        string `json:"name"`

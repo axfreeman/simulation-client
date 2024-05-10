@@ -195,8 +195,7 @@ func ShowIndustry(ctx *gin.Context) {
 	}
 
 	state := models.Users[username].Get_current_state()
-	id, _ := strconv.Atoi(ctx.Param("id")) //TODO check user didn't do something stupid
-	// TODO here and elsewhere create a method to get the simulation
+	id, _ := strconv.Atoi(ctx.Param("id"))
 	ilist := *models.Users[username].Industries()
 	for i := 0; i < len(ilist); i++ {
 		if id == ilist[i].Id {

@@ -13,6 +13,7 @@ type User struct {
 	Message             string // store for messages to be displayed to the user when appropriate
 	LastVisitedPage     string // Remember what the user was looking at (used when an action is requested)
 	ViewedTimeStamp     int    // Indexes the History field. Selects what the user is viewing
+	Dataset             map[string]api.DataObject
 	Sim                 api.DataObject
 	Com                 api.DataObject
 	Ind                 api.DataObject
@@ -66,18 +67,52 @@ func NewUser(username string, current_simulation_id int, apiKey string) User {
 			ApiKey:   apiKey,
 			DataList: new([]Trace),
 		},
+		Dataset: map[string]api.DataObject{
+			"simulations": {
+				ApiUrl:   `simulations/current`,
+				ApiKey:   apiKey,
+				DataList: new([]Simulation),
+			},
+			"commodities": {
+				ApiUrl:   `commodity`,
+				ApiKey:   apiKey,
+				DataList: new([]Commodity),
+			},
+			"industries": {
+				ApiUrl:   `industry`,
+				ApiKey:   apiKey,
+				DataList: new([]Industry),
+			},
+			"classes": {
+				ApiUrl:   `classes`,
+				ApiKey:   apiKey,
+				DataList: new([]Class),
+			},
+			"industry stocks": {
+				ApiUrl:   `stocks/industry`,
+				ApiKey:   apiKey,
+				DataList: new([]Industry_Stock),
+			},
+			"class stocks": {
+				ApiUrl:   `stocks/class`,
+				ApiKey:   apiKey,
+				DataList: new([]Class_Stock),
+			},
+			"trace": {
+				ApiUrl:   `trace`,
+				ApiKey:   apiKey,
+				DataList: new([]Trace),
+			},
+		},
 	}
 	return new_user
 }
 
 // Wrappers for the various lists.
-//
-// Main purpose is to provide for future development.
-//
-// SimulationList is a special case, because the dashboard displays a list
-// of the user's simulations. As a workaround, if the user has none we
-// make up a fake list with nothing in it, to ensure the app does not
-// crash when displaying the dashboard.
+
+// Special case, because the dashboard displays a list of the user's
+// simulations. If the user has none we make up a fake list with nothing
+// in it, to ensure the app does not crash when displaying the dashboard.
 func (u User) Simulations() *[]Simulation {
 	list := u.Sim.DataList.(*[]Simulation)
 	if len(*list) == 0 {
@@ -87,34 +122,31 @@ func (u User) Simulations() *[]Simulation {
 	return list
 }
 
-// Wrapper for the CommodityList
 func (u User) Commodities() *[]Commodity {
-	return u.Com.DataList.(*[]Commodity)
+	return u.Dataset["commodities"].DataList.(*[]Commodity)
 }
 
-// Wrapper for the IndustryList
 func (u User) Industries() *[]Industry {
-	return u.Ind.DataList.(*[]Industry)
+	return u.Dataset["industries"].DataList.(*[]Industry)
 }
 
-// Wrapper for the ClassList
 func (u User) Classes() *[]Class {
-	return u.Cla.DataList.(*[]Class)
+	return u.Dataset["classes"].DataList.(*[]Class)
 }
 
 // Wrapper for the IndustryStockList
 func (u User) IndustryStocks() *[]Industry_Stock {
-	return u.Isl.DataList.(*[]Industry_Stock)
+	return u.Dataset["industry stocks"].DataList.(*[]Industry_Stock)
 }
 
 // Wrapper for the ClassStockList
 func (u User) ClassStocks() *[]Class_Stock {
-	return u.Csl.DataList.(*[]Class_Stock)
+	return u.Dataset["class stocks"].DataList.(*[]Class_Stock)
 }
 
 // Wrapper for the TraceList
 func (u User) Traces() *[]Trace {
-	return u.Tra.DataList.(*[]Trace)
+	return u.Dataset["trace"].DataList.(*[]Trace)
 }
 
 // Format of responses from the server for post requests

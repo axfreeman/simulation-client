@@ -1,6 +1,5 @@
 // methods.simulation.go
 // class methods of the objects specified in models.simulation.go
-// TODO use address arithmetic to access all lists
 package models
 
 import (
@@ -8,9 +7,6 @@ import (
 	"log"
 	"strconv"
 )
-
-// TODO eliminate boilerplate by making generic
-// TODO see https://github.com/jose78/go-collection/blob/master/collections/collection.go  for suggestions
 
 //METHODS OF INDUSTRIES
 

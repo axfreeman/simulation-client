@@ -42,6 +42,12 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 		utils.Trace(utils.Red, "Tra did not fetch\n")
 	}
 
+	for key, value := range user.Dataset {
+		fmt.Println("Processing", key)
+		if !value.Fetch() {
+			utils.Trace(utils.Red, "Something went wrong\n")
+		}
+	}
 	// Comment for shorter diagnostics
 	// s, _ := json.MarshalIndent(models.Users[username], "  ", "  ")
 	// fmt.Printf("User record after creating the simulation is %s\n", string(s))
