@@ -8,7 +8,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"runtime"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -20,12 +19,6 @@ import (
 //
 // Returns: true if all tables succeed.
 func FetchUserObjects(ctx *gin.Context, username string) bool {
-	// Comment for shorter diagnostics
-	_, file, no, ok := runtime.Caller(1)
-	if ok {
-		utils.Trace(utils.Cyan, fmt.Sprintf(" Fetch user objects was called from %s#%d\n", file, no))
-	}
-
 	user := models.Users[username]
 	if !user.Sim.Fetch() {
 		utils.Trace(utils.Red, "Sim did not fetch\n")
@@ -58,7 +51,8 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 }
 
 // Populates an object.
-// Currently used only by Initialise, but could be generalised
+// Currently used only by Initialise.
+// TODO replace with FetchUserObjects.
 func FetchGlobalObject(url string, target any) bool {
 	resp, err := http.NewRequest("GET", url, nil)
 	if err != nil {

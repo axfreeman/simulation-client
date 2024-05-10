@@ -18,7 +18,6 @@ type DataObject struct {
 
 func (d *DataObject) Fetch() bool {
 	response, err := ServerRequest(d.ApiKey, d.ApiUrl)
-	// utils.Trace(utils.Red, fmt.Sprintf("The server response was %s\n", response))
 
 	if err != nil {
 		utils.Trace(utils.Red, fmt.Sprintf("ServerRequest produced the error %v\n", err))
