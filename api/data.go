@@ -1,7 +1,6 @@
-package data
+package api
 
 import (
-	"capfront/api"
 	"capfront/logging"
 	"capfront/utils"
 	"encoding/json"
@@ -19,7 +18,7 @@ type DataObject struct {
 }
 
 func (d DataObject) Fetch() bool {
-	body, err := api.ServerRequest(d.ApiKey, d.ApiUrl)
+	body, err := ServerRequest(d.ApiKey, d.ApiUrl)
 
 	if err != nil {
 		logging.Trace(utils.Cyan, fmt.Sprintf("ServerRequest produced the error %v\n", err))
