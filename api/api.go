@@ -5,7 +5,6 @@ package api
 
 import (
 	"bytes"
-	"capfront/logging"
 	"capfront/utils"
 	"fmt"
 	"io"
@@ -22,10 +21,10 @@ import (
 //	 Returns: byte array with the server response
 //	 Returns: error if anything went wrong, or nil
 func ServerRequest(apiKey string, url string) ([]byte, error) {
-	logging.Trace(utils.Cyan, fmt.Sprintf("Entering ServerRequest with apiKey %s and relative path %s\n", apiKey, url))
+	utils.Trace(utils.Cyan, fmt.Sprintf("Entering ServerRequest with apiKey %s and relative path %s\n", apiKey, url))
 	resp, err := http.NewRequest("GET", utils.APISOURCE+url, bytes.NewBuffer([]byte(`{"origin":"Simulation-client"}`)))
 	if err != nil {
-		logging.Trace(utils.Red, "Malformed client request")
+		utils.Trace(utils.Red, "Malformed client request")
 		return nil, err
 	}
 
@@ -36,7 +35,7 @@ func ServerRequest(apiKey string, url string) ([]byte, error) {
 	client := &http.Client{Timeout: time.Second * 5} // Timeout after 5 seconds
 	res, _ := client.Do(resp)
 	if res == nil {
-		logging.Trace(utils.Red, "Server is down or misbehaving")
+		utils.Trace(utils.Red, "Server is down or misbehaving")
 		return nil, nil
 	}
 
@@ -44,10 +43,10 @@ func ServerRequest(apiKey string, url string) ([]byte, error) {
 	b, _ := io.ReadAll(res.Body)
 
 	if res.StatusCode != 200 {
-		logging.Trace(utils.Red, fmt.Sprintf("Server rejected the request with status %s\n", res.Status))
-		logging.Trace(utils.Red, fmt.Sprintf("It said %s\n", string(b)))
+		utils.Trace(utils.Red, fmt.Sprintf("Server rejected the request with status %s\n", res.Status))
+		utils.Trace(utils.Red, fmt.Sprintf("It said %s\n", string(b)))
 		return nil, fmt.Errorf(string(b))
 	}
-	logging.Trace(utils.Cyan, "Leaving ServerRequest, everything looks good so far\n")
+	utils.Trace(utils.Cyan, "Leaving ServerRequest, everything looks good so far\n")
 	return b, nil
 }

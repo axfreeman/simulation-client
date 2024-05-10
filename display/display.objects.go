@@ -6,7 +6,6 @@ package display
 import (
 	"capfront/api"
 	"capfront/fetch"
-	"capfront/logging"
 	"capfront/models"
 	"capfront/utils"
 	"encoding/json"
@@ -30,14 +29,14 @@ func synchWithServer(ctx *gin.Context) (string, error) {
 	// Comment for less detailed diagnostics
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
-		logging.Trace(utils.Yellow, fmt.Sprintf(" UserStatus was called from %s#%d\n", file, no))
+		utils.Trace(utils.Yellow, fmt.Sprintf(" UserStatus was called from %s#%d\n", file, no))
 	}
 
 	// find out what the browser knows
 	username := utils.GUESTUSER
 	user := models.Users[username]
 	if user.ApiKey == "" {
-		logging.Trace(utils.Red, "ERROR: User has no api key\n")
+		utils.Trace(utils.Red, "ERROR: User has no api key\n")
 		return username, nil
 	}
 
@@ -54,9 +53,9 @@ func synchWithServer(ctx *gin.Context) (string, error) {
 		return username, err
 	}
 	// userDetails, _ := json.MarshalIndent(synched_user, " ", " ")
-	// logging.Trace(utils.Yellow, fmt.Sprintf("The server sent this user record: %s\n", string(userDetails)))
+	// utils.Trace(utils.Yellow, fmt.Sprintf("The server sent this user record: %s\n", string(userDetails)))
 
-	logging.Trace(utils.Yellow, fmt.Sprintf(
+	utils.Trace(utils.Yellow, fmt.Sprintf(
 		"The server sent a user record which says the current simulation is %d; the client says it is %d\n",
 		synched_user.CurrentSimulationID,
 		models.Users[username].CurrentSimulationID,
@@ -64,18 +63,18 @@ func synchWithServer(ctx *gin.Context) (string, error) {
 
 	// Update client data from the server if need be.
 	if models.Users[username].CurrentSimulationID != synched_user.CurrentSimulationID {
-		logging.Trace(utils.Yellow, fmt.Sprintf("We are out of synch. Server thinks our simulation is %d and client says it is %d\n",
+		utils.Trace(utils.Yellow, fmt.Sprintf("We are out of synch. Server thinks our simulation is %d and client says it is %d\n",
 			synched_user.CurrentSimulationID,
 			models.Users[username].CurrentSimulationID))
 		// Resynchronise
 		if !fetch.FetchUserObjects(ctx, username) {
-			logging.Trace(utils.Red, fmt.Sprintf("ERROR: Could not retrieve data for user %s\n", username))
+			utils.Trace(utils.Red, fmt.Sprintf("ERROR: Could not retrieve data for user %s\n", username))
 			return username, nil
 		}
 	}
 
 	models.Users[username].LastVisitedPage = ctx.Request.URL.Path
-	logging.Trace(utils.Yellow, fmt.Sprintf("User %s is good to go\n", username))
+	utils.Trace(utils.Yellow, fmt.Sprintf("User %s is good to go\n", username))
 	return username, nil
 }
 
@@ -121,7 +120,7 @@ func ShowCommodities(ctx *gin.Context) {
 		return
 	}
 	state := models.Users[username].Get_current_state()
-	logging.Trace(utils.Yellow, fmt.Sprintf("current state is %s\n", state))
+	utils.Trace(utils.Yellow, fmt.Sprintf("current state is %s\n", state))
 	ctx.HTML(http.StatusOK, "commodities.html", gin.H{
 		"Title":       "Commodities",
 		"commodities": models.Users[username].Commodities(),
@@ -241,7 +240,7 @@ func ShowIndexPage(ctx *gin.Context) {
 	// Uncomment for more detailed diagnostics
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
-		logging.Trace(utils.Yellow, fmt.Sprintf(" ShowIndexPage was called from %s#%d\n", file, no))
+		utils.Trace(utils.Yellow, fmt.Sprintf(" ShowIndexPage was called from %s#%d\n", file, no))
 	}
 	username, err := synchWithServer(ctx)
 	if err != nil {
@@ -291,7 +290,7 @@ func ShowTrace(ctx *gin.Context) {
 // in the user dashboard.
 func UserDashboard(ctx *gin.Context) {
 	if _, file, no, ok := runtime.Caller(1); ok {
-		logging.Trace(utils.Yellow, fmt.Sprintf(" User Dashboard was called from %s line #%d\n", file, no))
+		utils.Trace(utils.Yellow, fmt.Sprintf(" User Dashboard was called from %s line #%d\n", file, no))
 	}
 
 	username, err := synchWithServer(ctx)

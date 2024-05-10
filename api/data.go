@@ -1,7 +1,6 @@
 package api
 
 import (
-	"capfront/logging"
 	"capfront/utils"
 	"encoding/json"
 	"fmt"
@@ -21,7 +20,7 @@ func (d *DataObject) Fetch() bool {
 	body, err := ServerRequest(d.ApiKey, d.ApiUrl)
 
 	if err != nil {
-		logging.Trace(utils.Cyan, fmt.Sprintf("ServerRequest produced the error %v\n", err))
+		utils.Trace(utils.Cyan, fmt.Sprintf("ServerRequest produced the error %v\n", err))
 		return false
 	}
 
@@ -39,13 +38,13 @@ func (d *DataObject) Fetch() bool {
 	}
 
 	// Populate the data object.
-	logging.Trace(utils.Cyan, fmt.Sprintf("Unmarshalling data %s\n", string(body)))
+	utils.Trace(utils.Cyan, fmt.Sprintf("Unmarshalling data %s\n", string(body)))
 	jsonErr := json.Unmarshal(body, &d.DataList)
 	if jsonErr != nil {
-		logging.Trace(utils.Cyan, fmt.Sprintf("Server response could not be unmarshalled: it produced the error %v\n", jsonErr))
+		utils.Trace(utils.Cyan, fmt.Sprintf("Server response could not be unmarshalled: it produced the error %v\n", jsonErr))
 		return false
 	}
-	logging.Trace(utils.Cyan, "Server response was unmarshalled")
+	utils.Trace(utils.Cyan, "Server response was unmarshalled")
 	fmt.Println(d.DataList)
 	return true
 }

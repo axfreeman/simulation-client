@@ -9,7 +9,6 @@ package display
 import (
 	"capfront/api"
 	"capfront/fetch"
-	"capfront/logging"
 	"capfront/models"
 	"capfront/utils"
 	"encoding/json"
@@ -57,7 +56,7 @@ func ActionHandler(ctx *gin.Context) {
 	// Comment for less detailed diagnostics
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
-		logging.Trace(utils.Purple, fmt.Sprintf(" ActionHandler was called from %s #%d\n", file, no))
+		utils.Trace(utils.Purple, fmt.Sprintf(" ActionHandler was called from %s #%d\n", file, no))
 	}
 	var param string
 	err := ctx.ShouldBindUri(&param)
@@ -91,10 +90,10 @@ func ActionHandler(ctx *gin.Context) {
 	visitedPageURL := strings.Split(lastVisitedPage, "/")
 	log.Output(1, fmt.Sprintf("The last page this user visited was %v and this was split into%v", lastVisitedPage, visitedPageURL))
 	if useLastVisited(lastVisitedPage) {
-		// logging.Trace(utils.Purple, fmt.Sprintf("User will be redirected to the last visited page which was %s\n", lastVisitedPage))
+		// utils.Trace(utils.Purple, fmt.Sprintf("User will be redirected to the last visited page which was %s\n", lastVisitedPage))
 		ctx.Request.URL.Path = lastVisitedPage
 	} else {
-		// logging.Trace(utils.Purple, "User will be redirected to the Index Page, because the last visited URL was not a display page")
+		// utils.Trace(utils.Purple, "User will be redirected to the Index Page, because the last visited URL was not a display page")
 		ctx.Request.URL.Path = "/"
 	}
 	Router.HandleContext(ctx)
@@ -113,7 +112,7 @@ func CreateSimulation(ctx *gin.Context) {
 	// Comment for shorter diagnostics
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
-		logging.Trace(utils.Green, fmt.Sprintf(" Clone Simulation was called from %s#%d\n", file, no))
+		utils.Trace(utils.Green, fmt.Sprintf(" Clone Simulation was called from %s#%d\n", file, no))
 	}
 
 	username := utils.GUESTUSER
@@ -137,7 +136,7 @@ func CreateSimulation(ctx *gin.Context) {
 		return
 	}
 
-	logging.Trace(utils.Green, fmt.Sprintf("Setting current simulation to be %d", result.Simulation_id))
+	utils.Trace(utils.Green, fmt.Sprintf("Setting current simulation to be %d", result.Simulation_id))
 	models.Users[username].CurrentSimulationID = result.Simulation_id
 
 	// Diagnostic - comment or uncomment as needed

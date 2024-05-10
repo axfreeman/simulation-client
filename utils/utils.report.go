@@ -1,12 +1,11 @@
-//logging.report.go
+//utils.report.go
 
 // we are still experimenting with reportage.
 /// this is a kind of generic place to put the experikments
 
-package logging
+package utils
 
 import (
-	"capfront/utils"
 	"fmt"
 )
 
@@ -20,5 +19,5 @@ func Trace(startColour string, message string) {
 	if !TraceLevel {
 		return
 	}
-	fmt.Print(startColour + message + utils.Reset)
+	fmt.Print(startColour + message + Reset)
 }
