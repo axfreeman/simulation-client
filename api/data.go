@@ -17,32 +17,29 @@ type DataObject struct {
 }
 
 func (d *DataObject) Fetch() bool {
-	body, err := ServerRequest(d.ApiKey, d.ApiUrl)
+	response, err := ServerRequest(d.ApiKey, d.ApiUrl)
+	// utils.Trace(utils.Red, fmt.Sprintf("The server response was %s\n", response))
 
 	if err != nil {
-		utils.Trace(utils.Cyan, fmt.Sprintf("ServerRequest produced the error %v\n", err))
+		utils.Trace(utils.Red, fmt.Sprintf("ServerRequest produced the error %v\n", err))
 		return false
 	}
 
-	if len(string(body)) == 0 {
+	if len(string(response)) == 0 {
 		log.Output(1, "INFORMATION: The server response was empty")
 		return false
 	}
 
-	log.Output(1, fmt.Sprintf("INFORMATION: The server sent a table of length %d\n", len(string(body))))
-
-	// check for '[]' response (a list with no elements in it)
-	if body[0] == 91 && body[1] == 93 {
-		log.Output(1, "INFORMATION: The server sent an empty table; this means the user has no simulations yet.")
-		return false
-	}
+	fmt.Printf("Type of the data list is %T\n", d.DataList)
 
 	// Populate the data object
-	jsonErr := json.Unmarshal(body, &d.DataList)
+	jsonErr := json.Unmarshal(response, &d.DataList)
 	if jsonErr != nil {
-		utils.Trace(utils.Cyan, fmt.Sprintf("Server response could not be unmarshalled: it produced the error %v\n", jsonErr))
+		utils.Trace(utils.Red, fmt.Sprintf("Server response could not be unmarshalled: Unmarshal produced the error %v\n", jsonErr))
+		utils.Trace(utils.Red, fmt.Sprintf("The server response was %s\n", response))
 		return false
 	}
+
 	utils.Trace(utils.Cyan, "Server response was unmarshalled\n")
 	return true
 }

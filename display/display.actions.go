@@ -136,7 +136,7 @@ func CreateSimulation(ctx *gin.Context) {
 		return
 	}
 
-	utils.Trace(utils.Green, fmt.Sprintf("Setting current simulation to be %d", result.Simulation_id))
+	utils.Trace(utils.Green, fmt.Sprintf("Setting current simulation to be %d\n", result.Simulation_id))
 	models.Users[username].CurrentSimulationID = result.Simulation_id
 
 	// Diagnostic - comment or uncomment as needed

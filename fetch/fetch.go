@@ -27,27 +27,26 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 	}
 
 	user := models.Users[username]
-	utils.Trace(utils.Cyan, "Testing Data Objects")
 	if !user.Sim.Fetch() {
-		utils.Trace(utils.Cyan, "Sim did not fetch\n")
+		utils.Trace(utils.Red, "Sim did not fetch\n")
 	}
 	if !user.Com.Fetch() {
-		utils.Trace(utils.Cyan, "Com did not fetch\n")
+		utils.Trace(utils.Red, "Com did not fetch\n")
 	}
 	if !user.Ind.Fetch() {
-		utils.Trace(utils.Cyan, "Ind did not fetch\n")
+		utils.Trace(utils.Red, "Ind did not fetch\n")
 	}
 	if !user.Cla.Fetch() {
-		utils.Trace(utils.Cyan, "Cla did not fetch\n")
+		utils.Trace(utils.Red, "Cla did not fetch\n")
 	}
 	if !user.Isl.Fetch() {
-		utils.Trace(utils.Cyan, "Isl did not fetch\n")
+		utils.Trace(utils.Red, "Isl did not fetch\n")
 	}
 	if !user.Csl.Fetch() {
-		utils.Trace(utils.Cyan, "Csl did not fetch\n")
+		utils.Trace(utils.Red, "Csl did not fetch\n")
 	}
 	if !user.Tra.Fetch() {
-		utils.Trace(utils.Cyan, "Tra did not fetch\n")
+		utils.Trace(utils.Red, "Tra did not fetch\n")
 	}
 
 	// Comment for shorter diagnostics
