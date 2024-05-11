@@ -1,4 +1,4 @@
-// usergo
+// models.users.go
 // User models and related objects
 
 package models
@@ -10,12 +10,17 @@ type User struct {
 	UserName            string `json:"username"`              // Repeats the key in the map,for ease of use
 	ApiKey              string `json:"api_key"`               // The api key allocated to this user
 	CurrentSimulationID int    `json:"current_simulation_id"` // the id of the simulation that this user is currently using
-	Message             string // store for messages to be displayed to the user when appropriate
 	LastVisitedPage     string // Remember what the user was looking at (used when an action is requested)
 	ViewedTimeStamp     int    // Indexes the History field. Selects what the user is viewing
 	Dataset             map[string]api.DataObject
 	Sim                 api.DataObject
 }
+
+// contains the details of every user's simulations and their status, accessed by username
+var Users = make(map[string]*User)
+
+// List of basic user data, for use by the administrator
+var AdminUserList []User
 
 // Constructor for a dataset object.
 // Contains and defines all the standard objects of a simulation.
@@ -77,7 +82,7 @@ func NewUser(username string, current_simulation_id int, apiKey string) User {
 	return new_user
 }
 
-// Wrappers for the various lists.
+// Wrappers for the object lists.
 
 // Simulations is a special case, because the dashboard displays a list of user
 // simulations. If the user has none we make up a fake list with nothing
@@ -117,9 +122,3 @@ func (u User) ClassStocks() *[]Class_Stock {
 func (u User) Traces() *[]Trace {
 	return u.Dataset["trace"].DataList.(*[]Trace)
 }
-
-// contains the details of every user's simulations and their status, accessed by username
-var Users = make(map[string]*User)
-
-// List of basic user data, for use by the administrator
-var AdminUserList []User

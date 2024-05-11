@@ -255,7 +255,6 @@ func ShowIndexPage(ctx *gin.Context) {
 		"Title":       "Economy",
 		"industries":  ilist,
 		"commodities": clist,
-		"message":     models.Users[username].Message,
 		"classes":     cllist,
 		"username":    username,
 		"state":       state,
