@@ -1,10 +1,8 @@
 // display.actions.go
-// handlers for actions requested by the user
-
-package display
-
 // This module processes the actions that take the simulation through
 // a circuit - Demand, Supply, Trade, Produce, Consume, Invest
+
+package display
 
 import (
 	"capfront/api"

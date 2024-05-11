@@ -133,7 +133,7 @@ func ShowCommodities(ctx *gin.Context) {
 func ShowIndustries(ctx *gin.Context) {
 	username, err := synchWithServer(ctx)
 	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve Industries ")
+		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display Industries ")
 		return
 	}
 
@@ -150,7 +150,7 @@ func ShowIndustries(ctx *gin.Context) {
 func ShowClasses(ctx *gin.Context) {
 	username, err := synchWithServer(ctx)
 	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve Classes ")
+		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display Classes ")
 		return
 	}
 	state := models.Users[username].Get_current_state()
@@ -166,7 +166,7 @@ func ShowClasses(ctx *gin.Context) {
 func ShowCommodity(ctx *gin.Context) {
 	username, err := synchWithServer(ctx)
 	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve one Commodity ")
+		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display one Commodity ")
 		return
 	}
 
@@ -190,7 +190,7 @@ func ShowCommodity(ctx *gin.Context) {
 func ShowIndustry(ctx *gin.Context) {
 	username, err := synchWithServer(ctx)
 	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve one industry ")
+		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display one industry ")
 		return
 	}
 
@@ -213,7 +213,7 @@ func ShowIndustry(ctx *gin.Context) {
 func ShowClass(ctx *gin.Context) {
 	username, err := synchWithServer(ctx)
 	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve one class ")
+		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display one class ")
 		return
 	}
 
@@ -243,7 +243,7 @@ func ShowIndexPage(ctx *gin.Context) {
 	}
 	username, err := synchWithServer(ctx)
 	if err != nil {
-		utils.DisplayError(ctx, " Problem retrieving index page ")
+		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display the Index Page ")
 		return
 	}
 	state := models.Users[username].Get_current_state()
@@ -265,7 +265,7 @@ func ShowIndexPage(ctx *gin.Context) {
 func ShowTrace(ctx *gin.Context) {
 	username, err := synchWithServer(ctx)
 	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve Trace records ")
+		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display Trace records ")
 		return
 	}
 
@@ -293,7 +293,7 @@ func UserDashboard(ctx *gin.Context) {
 
 	username, err := synchWithServer(ctx)
 	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve data for the user dashboard ")
+		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display the User dashboard ")
 		return
 	}
 
@@ -318,7 +318,7 @@ func DataHandler(ctx *gin.Context) {
 func SwitchSimulation(ctx *gin.Context) {
 	username, err := synchWithServer(ctx)
 	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve Data Listing ")
+		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display Data Listing ")
 		return
 	}
 
@@ -341,7 +341,7 @@ func RestartSimulation(ctx *gin.Context) {
 func ShowIndustryStocks(ctx *gin.Context) {
 	username, err := synchWithServer(ctx)
 	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve industry Stocks ")
+		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display industry Stocks ")
 		return
 	}
 
@@ -363,7 +363,7 @@ func ShowIndustryStocks(ctx *gin.Context) {
 func ShowClassStocks(ctx *gin.Context) {
 	username, err := synchWithServer(ctx)
 	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve Class Stocks ")
+		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display Class Stocks ")
 		return
 	}
 
