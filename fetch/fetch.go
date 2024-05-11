@@ -28,7 +28,7 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 	if !user.Sim.Fetch() {
 		utils.Trace(utils.Red, "Sim did not fetch\n")
 	}
-	for key, value := range user.Datasets {
+	for key, value := range user.OldDataSet {
 		fmt.Println("Processing", key)
 		if !value.Fetch() {
 			utils.Trace(utils.Red, "Something went wrong\n")
