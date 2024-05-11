@@ -121,6 +121,18 @@ func ShowCommodities(ctx *gin.Context) {
 	}
 	user := models.Users[username]
 	state := user.Get_current_state()
+
+	// diagnostic to see what gin.H does
+
+	fmt.Println(
+		gin.H{
+			"Title":       "Commodities",
+			"commodities": user.Commodities(),
+			"username":    username,
+			"state":       state,
+		},
+	)
+
 	ctx.HTML(http.StatusOK, "commodities.html", gin.H{
 		"Title":       "Commodities",
 		"commodities": user.Commodities(),

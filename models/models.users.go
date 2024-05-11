@@ -7,12 +7,12 @@ import "capfront/api"
 
 // Full details of a user.
 type User struct {
-	UserName            string                    `json:"username"`              // Repeats the key in the map,for ease of use
-	ApiKey              string                    `json:"api_key"`               // The api key allocated to this user
-	CurrentSimulationID int                       `json:"current_simulation_id"` // the id of the simulation that this user is currently using
-	LastVisitedPage     string                    // Remember what the user was looking at (used when an action is requested)
-	ViewedTimeStamp     int                       // Indexes the History field. Selects what the user is viewing
-	Dataset             map[string]api.DataObject // All the data objects
+	UserName            string  `json:"username"`              // Repeats the key in the map,for ease of use
+	ApiKey              string  `json:"api_key"`               // The api key allocated to this user
+	CurrentSimulationID int     `json:"current_simulation_id"` // the id of the simulation that this user is currently using
+	LastVisitedPage     string  // Remember what the user was looking at (used when an action is requested)
+	ViewedTimeStamp     int     // Indexes the History field. Selects what the user is viewing
+	Datasets            Dataset // All the data objects
 	Sim                 api.DataObject
 }
 
@@ -22,9 +22,11 @@ var Users = make(map[string]*User)
 // List of basic user data, for use by the administrator
 var AdminUserList []User
 
+type Dataset map[string]api.DataObject
+
 // Constructor for a dataset object.
 // Contains and defines all the standard objects of a simulation.
-func NewDataset(apiKey string) map[string]api.DataObject {
+func NewDataset(apiKey string) Dataset {
 	return map[string]api.DataObject{
 		"simulations": {
 			ApiUrl:   `simulations/current`,
@@ -77,7 +79,7 @@ func NewUser(username string, current_simulation_id int, apiKey string) User {
 			ApiKey:   apiKey,
 			DataList: new([]Simulation),
 		},
-		Dataset: NewDataset(apiKey),
+		Datasets: NewDataset(apiKey),
 	}
 	return new_user
 }
@@ -97,28 +99,28 @@ func (u User) Simulations() *[]Simulation {
 }
 
 func (u User) Commodities() *[]Commodity {
-	return u.Dataset["commodities"].DataList.(*[]Commodity)
+	return u.Datasets["commodities"].DataList.(*[]Commodity)
 }
 
 func (u User) Industries() *[]Industry {
-	return u.Dataset["industries"].DataList.(*[]Industry)
+	return u.Datasets["industries"].DataList.(*[]Industry)
 }
 
 func (u User) Classes() *[]Class {
-	return u.Dataset["classes"].DataList.(*[]Class)
+	return u.Datasets["classes"].DataList.(*[]Class)
 }
 
 // Wrapper for the IndustryStockList
 func (u User) IndustryStocks() *[]Industry_Stock {
-	return u.Dataset["industry stocks"].DataList.(*[]Industry_Stock)
+	return u.Datasets["industry stocks"].DataList.(*[]Industry_Stock)
 }
 
 // Wrapper for the ClassStockList
 func (u User) ClassStocks() *[]Class_Stock {
-	return u.Dataset["class stocks"].DataList.(*[]Class_Stock)
+	return u.Datasets["class stocks"].DataList.(*[]Class_Stock)
 }
 
 // Wrapper for the TraceList
 func (u User) Traces() *[]Trace {
-	return u.Dataset["trace"].DataList.(*[]Trace)
+	return u.Datasets["trace"].DataList.(*[]Trace)
 }

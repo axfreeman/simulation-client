@@ -32,7 +32,8 @@ func (d *DataObject) Fetch() bool {
 		return false
 	}
 
-	fmt.Printf("Type of the data list is %T\n", d.DataList)
+	// Uncomment for more diagnostics
+	// fmt.Printf("Type of the data list is %T\n", d.DataList)
 
 	// Populate the data object
 	jsonErr := json.Unmarshal(response, &d.DataList)
@@ -42,6 +43,7 @@ func (d *DataObject) Fetch() bool {
 		return false
 	}
 
-	utils.Trace(utils.Cyan, "Server response was unmarshalled\n")
+	// Uncomment for more diagnostics
+	// utils.Trace(utils.Cyan, "Server response was unmarshalled\n")
 	return true
 }
