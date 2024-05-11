@@ -134,6 +134,7 @@ func CreateSimulation(ctx *gin.Context) {
 		return
 	}
 
+	// Set the current simulation
 	utils.Trace(utils.Green, fmt.Sprintf("Setting current simulation to be %d\n", result.Simulation_id))
 	models.Users[username].CurrentSimulationID = result.Simulation_id
 
@@ -141,9 +142,17 @@ func CreateSimulation(ctx *gin.Context) {
 	// s, _ := json.MarshalIndent(models.Users[username], "  ", "  ")
 	// fmt.Printf("User record after creating the simulation is %s\n", string(s))
 
+	// Fetch the whole (new) dataset from the server
+	// (until now we only told the server to create it - now we want it)
 	if !fetch.FetchUserObjects(ctx, username) {
 		utils.DisplayError(ctx, "WARNING: though the server created a simulation, we could not retrieve all its data")
 	}
+	// Initialise the timeStamp so that we are viewing the first dataset.
+	// As the user moves through the circuit, this timestamp will move forwards.
+	// Each time we move forward, a new dataset will be created.
+	// This allows the user to view and compare with previous stages of the simulation.
+	models.Users[username].ViewedTimeStamp = 0
+
 	ctx.Request.URL.Path = "/"
 	Router.HandleContext(ctx)
 }

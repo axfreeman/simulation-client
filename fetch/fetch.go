@@ -28,13 +28,19 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 	if !user.Sim.Fetch() {
 		utils.Trace(utils.Red, "Sim did not fetch\n")
 	}
-	for key, value := range user.OldDataSet {
-		fmt.Println("Processing", key)
+	// for key, value := range user.OldDataSet {
+	// 	if !value.Fetch() {
+	// 		log.Output(1, fmt.Sprintf("Could not retrieve server data for the old dataset with key %s\n", key))
+	// 	}
+	// }
+
+	newDataSet := *user.Datasets[0]
+
+	for key, value := range newDataSet {
 		if !value.Fetch() {
-			utils.Trace(utils.Red, "Something went wrong\n")
+			log.Output(1, fmt.Sprintf("Could not retrieve server data for the new dataset with key %s\n", key))
 		}
 	}
-
 	utils.Trace(utils.Cyan, "Refresh complete\n")
 	return true
 }
