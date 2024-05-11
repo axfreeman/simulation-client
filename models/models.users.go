@@ -7,12 +7,12 @@ import "capfront/api"
 
 // Full details of a user.
 type User struct {
-	UserName            string `json:"username"`              // Repeats the key in the map,for ease of use
-	ApiKey              string `json:"api_key"`               // The api key allocated to this user
-	CurrentSimulationID int    `json:"current_simulation_id"` // the id of the simulation that this user is currently using
-	LastVisitedPage     string // Remember what the user was looking at (used when an action is requested)
-	ViewedTimeStamp     int    // Indexes the History field. Selects what the user is viewing
-	Dataset             map[string]api.DataObject
+	UserName            string                    `json:"username"`              // Repeats the key in the map,for ease of use
+	ApiKey              string                    `json:"api_key"`               // The api key allocated to this user
+	CurrentSimulationID int                       `json:"current_simulation_id"` // the id of the simulation that this user is currently using
+	LastVisitedPage     string                    // Remember what the user was looking at (used when an action is requested)
+	ViewedTimeStamp     int                       // Indexes the History field. Selects what the user is viewing
+	Dataset             map[string]api.DataObject // All the data objects
 	Sim                 api.DataObject
 }
 

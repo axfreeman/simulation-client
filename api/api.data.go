@@ -1,3 +1,6 @@
+// api.data.go
+// DataObject is the intermediary between the client and the server.
+
 package api
 
 import (

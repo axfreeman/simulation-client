@@ -1,3 +1,8 @@
+// fetch.go
+// separate package for getting data from the api.
+// seems to be necessary to keep this separate to avoid circular imports.
+// Arrived at pragmatically - haven't really thought it through.
+
 package fetch
 
 import (
@@ -34,7 +39,6 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 	return true
 }
 
-// Populates an object.
 // Currently used only by Initialise.
 // TODO replace with FetchUserObjects.
 func FetchGlobalObject(url string, target any) bool {
