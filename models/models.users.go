@@ -11,7 +11,7 @@ type User struct {
 	ApiKey              string         `json:"api_key"`               // The api key allocated to this user
 	CurrentSimulationID int            `json:"current_simulation_id"` // the id of the simulation that this user is currently using
 	LastVisitedPage     string         // Remember what the user was looking at (used when an action is requested)
-	Datasets            []Dataset      // Repository for the data objects generated during the simulation
+	Datasets            []*Dataset     // Repository for the data objects generated during the simulation
 	ViewedTimeStamp     int            // Indexes Datasets. Selects what the user is viewing
 	OldDataSet          Dataset        // All the data objects - to be replaced by 'Datasets'
 	Sim                 api.DataObject // Details of the current simulation
@@ -76,8 +76,11 @@ func NewUser(username string, current_simulation_id int, apiKey string) User {
 			ApiKey:   apiKey,
 			DataList: new([]Simulation),
 		},
-		OldDataSet: NewDataset(apiKey),
+		OldDataSet: NewDataset(apiKey), // TODO remove once Datasets is working
 	}
+	new_user.Datasets = []*Dataset{}
+	new_dataset := NewDataset(new_user.ApiKey)
+	new_user.Datasets = append(new_user.Datasets, &new_dataset)
 	return new_user
 }
 
