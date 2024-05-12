@@ -258,10 +258,12 @@ func ShowIndexPage(ctx *gin.Context) {
 		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display the Index Page ")
 		return
 	}
-	state := models.Users[username].Get_current_state()
-	clist := *models.Users[username].Commodities()
-	ilist := *models.Users[username].Industries()
-	cllist := *models.Users[username].Classes()
+
+	u := models.Users[username]
+	state := u.Get_current_state()
+	clist := u.Commodities()
+	ilist := u.Industries()
+	cllist := u.Classes()
 
 	ctx.HTML(http.StatusOK, "index.html", gin.H{
 		"Title":       "Economy",

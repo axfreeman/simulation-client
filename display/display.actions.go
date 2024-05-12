@@ -91,6 +91,9 @@ func ActionHandler(ctx *gin.Context) {
 	// NOTE we are assuming it is appended as element user.TimeStamp+1
 	// but as yet I haven't found documentation confirming this.
 	user.Datasets = append(user.Datasets, &new_dataset)
+	// Set the Comparator TimeStamp to compare with the effect of the previous action
+	user.ComparatorTimeStamp = user.TimeStamp
+	// Advance the TimeStamp to refer to the effect of this action.
 	user.TimeStamp += 1
 	// Reset viewed time stamp to point to the results of this action.
 	user.ViewedTimeStamp = user.TimeStamp
@@ -179,12 +182,16 @@ func CreateSimulation(ctx *gin.Context) {
 }
 
 func Back(ctx *gin.Context) {
-	utils.Trace(utils.Purple, "Back was requested")
+	utils.Trace(utils.Purple, "Back was requested\n")
 	username := utils.GUESTUSER
 	user := models.Users[username] // Should we test for non-existing user?
 	if user.ViewedTimeStamp > 0 {
 		user.ViewedTimeStamp--
 	}
+	if user.ComparatorTimeStamp > 0 {
+		user.ComparatorTimeStamp--
+	}
+
 	lastVisitedPage := user.LastVisitedPage
 
 	if useLastVisited(lastVisitedPage) {
@@ -196,11 +203,12 @@ func Back(ctx *gin.Context) {
 }
 
 func Forward(ctx *gin.Context) {
-	utils.Trace(utils.Purple, "Forward was requested")
+	utils.Trace(utils.Purple, "Forward was requested\n")
 	username := utils.GUESTUSER
 	user := models.Users[username] // Should we test for non-existing user?
 	if user.ViewedTimeStamp < user.TimeStamp {
 		user.ViewedTimeStamp++
+		user.ComparatorTimeStamp++
 	}
 	lastVisitedPage := user.LastVisitedPage
 

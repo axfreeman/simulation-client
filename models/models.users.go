@@ -14,6 +14,7 @@ type User struct {
 	Datasets            []*Dataset     // Repository for the data objects generated during the simulation
 	TimeStamp           int            // Indexes Datasets. Selects the stage that the simulation has reached
 	ViewedTimeStamp     int            // Indexes Datasets. Selects what the user is viewing
+	ComparatorTimeStamp int            // Indexes Datasets. Selects what Viewed items are compared with.
 	Sim                 api.DataObject // Details of the current simulation
 }
 
@@ -72,6 +73,7 @@ func NewUser(username string, current_simulation_id int, apiKey string) User {
 		LastVisitedPage:     "",
 		TimeStamp:           0,
 		ViewedTimeStamp:     0,
+		ComparatorTimeStamp: 0,
 		Datasets:            []*Dataset{},
 		Sim: api.DataObject{
 			ApiUrl:   `simulations/current`,
@@ -99,8 +101,14 @@ func (u User) Simulations() *[]Simulation {
 }
 
 func (u User) Commodities() *[]Commodity {
-	// currentDataSet := *u.Datasets[u.ViewedTimeStamp]
-	// currentDataObject := currentDataSet["commodities"]
+	return (*u.Datasets[u.ViewedTimeStamp])["commodities"].DataList.(*[]Commodity)
+}
+
+func (u User) ViewedCommodities() *[]Commodity {
+	return (*u.Datasets[u.ViewedTimeStamp])["commodities"].DataList.(*[]Commodity)
+}
+
+func (u User) ComparedCommodities() *[]Commodity {
 	return (*u.Datasets[u.ViewedTimeStamp])["commodities"].DataList.(*[]Commodity)
 }
 
