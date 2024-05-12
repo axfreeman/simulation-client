@@ -71,7 +71,6 @@ var NotFoundCommodity = Commodity{
 }
 
 // returns the money stock of the given industry
-// WAS err = db.SDB.QueryRowx("SELECT * FROM stocks where Owner_Id = ? AND Usage_type =?", industry.Id, "Money").StructScan(&stock)
 func (industry Industry) MoneyStock() Industry_Stock {
 	username := industry.UserName
 	stockList := *Users[username].IndustryStocks()
@@ -85,7 +84,6 @@ func (industry Industry) MoneyStock() Industry_Stock {
 }
 
 // returns the sales stock of the given industry
-// WAS 	err = db.SDB.QueryRowx("SELECT * FROM stocks where Owner_Id = ? AND Usage_type =?", industry.Id, "Sales").StructScan(&stock)
 func (industry Industry) SalesStock() Industry_Stock {
 	username := industry.UserName
 	stockList := *Users[username].IndustryStocks()
@@ -99,7 +97,6 @@ func (industry Industry) SalesStock() Industry_Stock {
 }
 
 // returns the Labour Power stock of the given industry
-// was query := `SELECT stocks.* FROM stocks INNER JOIN commodities ON stocks.commodity_id = commodities.id where stocks.owner_id = ? AND Usage_type ="Production" AND commodities.name="Labour Power"`
 // bit of a botch to use the name of the commodity as a search term
 func (industry Industry) VariableCapital() Industry_Stock {
 	username := industry.UserName
@@ -120,7 +117,6 @@ func (industry Industry) OutputCommodity() *Commodity {
 
 // return the productive capital stock of the given industry
 // under development - at present assumes there is only one
-// was 	query := `SELECT stocks.* FROM stocks INNER JOIN commodities ON stocks.commodity_id = commodities.id where stocks.owner_id = ? AND Usage_type ="Production" AND commodities.name="Means of Production"`
 func (industry Industry) ConstantCapital() Industry_Stock {
 	username := industry.UserName
 	stockList := *Users[username].IndustryStocks()
@@ -133,8 +129,8 @@ func (industry Industry) ConstantCapital() Industry_Stock {
 	return NotFoundIndustryStock
 }
 
-// returns all the constant capitals of a given industry
-// TODO under development
+// returns all the constant capitals of a given industry.
+// Under development.
 // func (industry Industry) ConstantCapitals() []Stock {
 // 	return &stocks [Programming error here]
 // }

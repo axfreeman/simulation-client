@@ -12,6 +12,7 @@ type User struct {
 	CurrentSimulationID int            `json:"current_simulation_id"` // the id of the simulation that this user is currently using
 	LastVisitedPage     string         // Remember what the user was looking at (used when an action is requested)
 	Datasets            []*Dataset     // Repository for the data objects generated during the simulation
+	TimeStamp           int            // Indexes Datasets. Selects the stage that the simulation has reached
 	ViewedTimeStamp     int            // Indexes Datasets. Selects what the user is viewing
 	Sim                 api.DataObject // Details of the current simulation
 }
@@ -69,24 +70,25 @@ func NewUser(username string, current_simulation_id int, apiKey string) User {
 		ApiKey:              apiKey,
 		CurrentSimulationID: current_simulation_id,
 		LastVisitedPage:     "",
+		TimeStamp:           0,
 		ViewedTimeStamp:     0,
+		Datasets:            []*Dataset{},
 		Sim: api.DataObject{
 			ApiUrl:   `simulations/current`,
 			ApiKey:   apiKey,
 			DataList: new([]Simulation),
 		},
 	}
-	new_user.Datasets = []*Dataset{}
 	new_dataset := NewDataset(new_user.ApiKey)
 	new_user.Datasets = append(new_user.Datasets, &new_dataset)
 	return new_user
 }
 
 // Wrappers for the object lists.
-
-// Simulations is a special case, because the dashboard displays a list of user
-// simulations. If the user has none we make up a fake list with nothing
-// in it, to ensure the app does not crash when displaying the dashboard.
+// The Simulations wrapper is a special case, because the dashboard
+// displays a list of user simulations which may be empty.
+// If the user has no simulationsm, we make up a fake list with nothing
+// in it, to ensure the app can display the dashboard.
 func (u User) Simulations() *[]Simulation {
 	list := u.Sim.DataList.(*[]Simulation)
 	if len(*list) == 0 {

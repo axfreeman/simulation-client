@@ -57,18 +57,23 @@ func ActionHandler(ctx *gin.Context) {
 		utils.Trace(utils.Purple, fmt.Sprintf(" ActionHandler was called from %s #%d\n", file, no))
 	}
 	var param string
+
+	// Basic check: validate the syntax if the action parameter
 	err := ctx.ShouldBindUri(&param)
 	if err != nil {
 		fmt.Println("Malformed URL", err)
 		ctx.String(http.StatusBadRequest, "Malformed URL")
 		return
 	}
+
+	// It is syntactically well-formed. Send it to the server.
 	act := ctx.Param("action")
 	username := utils.GUESTUSER
 	userDatum := models.Users[username] // NOTE we assume the user exists in local storage
 	lastVisitedPage := userDatum.LastVisitedPage
 	log.Output(1, fmt.Sprintf("User %s wants the server to implement action %s. The last visited page was %s\n", username, act, lastVisitedPage))
 
+	// Check that the server understood it.
 	_, err = api.ServerRequest(userDatum.ApiKey, `action/`+act)
 	if err != nil {
 		utils.DisplayError(ctx, "The server could not complete the action")
