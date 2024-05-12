@@ -7,7 +7,10 @@ import (
 	"capfront/utils"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
+	"time"
 )
 
 // Defines a data object to be synchronised with the server
@@ -45,5 +48,38 @@ func (d *DataObject) Fetch() bool {
 
 	// Uncomment for more diagnostics
 	// utils.Trace(utils.Cyan, "Server response was unmarshalled\n")
+	return true
+}
+
+// Currently used only by Initialise.
+func FetchGlobalObject(url string, target any) bool {
+	resp, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Output(1, fmt.Sprint("Error constructing server request", err))
+		return false
+	}
+
+	resp.Header.Add("x-api-key", utils.ADMINKEY)
+	client := &http.Client{Timeout: time.Second * 2} // Timeout after 2 seconds
+	res, _ := client.Do(resp)
+	if res == nil {
+		log.Output(1, "Server did not respond")
+		return false
+	}
+
+	if res.StatusCode != 200 {
+		log.Output(1, "Server rejected admin request")
+		return false
+	}
+
+	body_as_string, _ := io.ReadAll(res.Body)
+	defer res.Body.Close()
+
+	jsonErr := json.Unmarshal(body_as_string, target)
+	if jsonErr != nil {
+		log.Output(1, fmt.Sprint("Could not unmarshal the server response:\n", string(body_as_string)))
+		return false
+	}
+	log.Output(1, "Request for server data accepted")
 	return true
 }

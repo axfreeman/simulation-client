@@ -5,5 +5,8 @@
 * https://dev.to/nikl/using-goland-and-gin-framework-to-build-restful-api-7-steps-2834
 * https://www.cnblogs.com/wangshushuo/p/17254809.html
 
+## Json
+* https://www.alexedwards.net/blog/how-to-properly-parse-a-json-request-body
 
-* See https://www.alexedwards.net/blog/how-to-properly-parse-a-json-request-body
+## Templating
+* https://docs.gofiber.io/template/next/html/TEMPLATES_CHEATSHEET/  
