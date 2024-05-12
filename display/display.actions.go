@@ -69,17 +69,32 @@ func ActionHandler(ctx *gin.Context) {
 	// It is syntactically well-formed. Send it to the server.
 	act := ctx.Param("action")
 	username := utils.GUESTUSER
-	userDatum := models.Users[username] // NOTE we assume the user exists in local storage
-	lastVisitedPage := userDatum.LastVisitedPage
+	user := models.Users[username] // NOTE we assume the user exists in local storage
+	lastVisitedPage := user.LastVisitedPage
 	log.Output(1, fmt.Sprintf("User %s wants the server to implement action %s. The last visited page was %s\n", username, act, lastVisitedPage))
 
 	// Check that the server understood it.
-	_, err = api.ServerRequest(userDatum.ApiKey, `action/`+act)
+	_, err = api.ServerRequest(user.ApiKey, `action/`+act)
 	if err != nil {
 		utils.DisplayError(ctx, "The server could not complete the action")
 	}
 
-	// The action was taken. Now refresh the data from the server
+	// The action was taken.
+	// Advance both the TimeStamp AND the ViewedTimeStamp and create a new
+	// Dataset.This (ought to) place the next fetched dataset in the new
+	// record, preserving the previous record.
+
+	// Create a new dataset
+	new_dataset := models.NewDataset(user.ApiKey)
+
+	// Append it to Datasets.
+	// NOTE we are assuming it is appended as element user.TimeStamp+1
+	// but as yet I haven't found documentation confirming this.
+	user.Datasets = append(user.Datasets, &new_dataset)
+	user.TimeStamp += 1
+	user.ViewedTimeStamp += 1
+
+	// Now refresh the data from the server
 	if !fetch.FetchUserObjects(ctx, username) {
 		utils.DisplayError(ctx, "The server completed the action but did not send back any data.")
 	}

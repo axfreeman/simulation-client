@@ -29,10 +29,9 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 		utils.Trace(utils.Red, "Sim did not fetch\n")
 	}
 
-	// timeStamp:=user.ViewedTimeStamp
-	newDataSet := *user.Datasets[0]
+	dataSet := *user.Datasets[user.TimeStamp]
 
-	for key, value := range newDataSet {
+	for key, value := range dataSet {
 		if !value.Fetch() {
 			log.Output(1, fmt.Sprintf("Could not retrieve server data for the new dataset with key %s\n", key))
 		}
