@@ -177,3 +177,37 @@ func CreateSimulation(ctx *gin.Context) {
 	ctx.Request.URL.Path = "/"
 	Router.HandleContext(ctx)
 }
+
+func Back(ctx *gin.Context) {
+	utils.Trace(utils.Purple, "Back was requested")
+	username := utils.GUESTUSER
+	user := models.Users[username] // Should we test for non-existing user?
+	if user.ViewedTimeStamp > 0 {
+		user.ViewedTimeStamp--
+	}
+	lastVisitedPage := user.LastVisitedPage
+
+	if useLastVisited(lastVisitedPage) {
+		ctx.Request.URL.Path = lastVisitedPage
+	} else {
+		ctx.Request.URL.Path = "/"
+	}
+	Router.HandleContext(ctx)
+}
+
+func Forward(ctx *gin.Context) {
+	utils.Trace(utils.Purple, "Forward was requested")
+	username := utils.GUESTUSER
+	user := models.Users[username] // Should we test for non-existing user?
+	if user.ViewedTimeStamp < user.TimeStamp {
+		user.ViewedTimeStamp++
+	}
+	lastVisitedPage := user.LastVisitedPage
+
+	if useLastVisited(lastVisitedPage) {
+		ctx.Request.URL.Path = lastVisitedPage
+	} else {
+		ctx.Request.URL.Path = "/"
+	}
+	Router.HandleContext(ctx)
+}

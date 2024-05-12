@@ -36,6 +36,9 @@ func main() {
 	display.Router.GET("/admin/dashboard", display.AdminDashboard)
 	display.Router.GET("/admin/reset", display.AdminReset)
 
+	display.Router.GET("/back", display.Back)
+	display.Router.GET("/forward", display.Forward)
+
 	fetch.Initialise()
 	display.ListData()
 
