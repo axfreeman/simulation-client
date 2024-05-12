@@ -92,7 +92,8 @@ func ActionHandler(ctx *gin.Context) {
 	// but as yet I haven't found documentation confirming this.
 	user.Datasets = append(user.Datasets, &new_dataset)
 	user.TimeStamp += 1
-	user.ViewedTimeStamp += 1
+	// Reset viewed time stamp to point to the results of this action.
+	user.ViewedTimeStamp = user.TimeStamp
 
 	// Now refresh the data from the server
 	if !fetch.FetchUserObjects(ctx, username) {
