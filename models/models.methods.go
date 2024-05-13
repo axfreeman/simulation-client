@@ -70,6 +70,10 @@ var NotFoundCommodity = Commodity{
 	Investment_Proportion:       0,
 }
 
+func (p Pair) Display() string {
+	return fmt.Sprintf("%0.2f", p.Viewed)
+}
+
 // returns the money stock of the given industry
 func (industry Industry) MoneyStock() Industry_Stock {
 	username := industry.UserName
@@ -336,4 +340,37 @@ func (u User) Set_current_state(new_state string) {
 		}
 		log.Output(1, fmt.Sprintf("simulation with id %d not found", id))
 	}
+}
+
+// Create a CommodityView object for display in a template
+// taking data from two Commodity objects; one being viewed now,
+// the other showing the state of the simulation at some time in the 'past'
+func NewCommodityView(v *Commodity, c *Commodity) *CommodityView {
+	newCommodityView := CommodityView{
+		Id:                          v.Id,
+		Name:                        v.Name,
+		Origin:                      v.Origin,
+		Usage:                       v.Usage,
+		Size:                        Pair{Viewed: v.Size, Compared: c.Size},
+		Total_Value:                 Pair{Viewed: (v.Total_Value), Compared: (c.Total_Value)},
+		Total_Price:                 Pair{Viewed: (v.Total_Price), Compared: (c.Total_Price)},
+		Unit_Value:                  Pair{Viewed: (v.Unit_Value), Compared: (c.Unit_Value)},
+		Unit_Price:                  Pair{Viewed: (v.Unit_Price), Compared: (c.Unit_Price)},
+		Turnover_Time:               Pair{Viewed: v.Turnover_Time, Compared: c.Turnover_Time},
+		Demand:                      Pair{Viewed: v.Demand, Compared: c.Demand},
+		Supply:                      Pair{Viewed: v.Supply, Compared: c.Supply},
+		Allocation_Ratio:            Pair{Viewed: v.Allocation_Ratio, Compared: c.Allocation_Ratio},
+		Monetarily_Effective_Demand: v.Monetarily_Effective_Demand,
+		Investment_Proportion:       v.Investment_Proportion,
+	}
+	return &newCommodityView
+}
+
+func NewCommodityViews(v *[]Commodity, c *[]Commodity) *[]CommodityView {
+	var newCommodityViews = make([]CommodityView, len(*v))
+	for i := range *v {
+		newCommodityView := NewCommodityView(&(*v)[i], &(*c)[i])
+		newCommodityViews[i] = *newCommodityView
+	}
+	return &newCommodityViews
 }

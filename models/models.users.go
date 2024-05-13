@@ -104,12 +104,10 @@ func (u User) Commodities() *[]Commodity {
 	return (*u.Datasets[u.ViewedTimeStamp])["commodities"].DataList.(*[]Commodity)
 }
 
-func (u User) ViewedCommodities() *[]Commodity {
-	return (*u.Datasets[u.ViewedTimeStamp])["commodities"].DataList.(*[]Commodity)
-}
-
-func (u User) ComparedCommodities() *[]Commodity {
-	return (*u.Datasets[u.ViewedTimeStamp])["commodities"].DataList.(*[]Commodity)
+func (u User) CommodityViews() *[]CommodityView {
+	v := (*u.Datasets[u.ViewedTimeStamp])["commodities"].DataList.(*[]Commodity)
+	c := (*u.Datasets[u.ComparatorTimeStamp])["commodities"].DataList.(*[]Commodity)
+	return NewCommodityViews(v, c)
 }
 
 func (u User) Industries() *[]Industry {
