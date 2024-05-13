@@ -4,6 +4,7 @@ package models
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"strconv"
 )
@@ -70,8 +71,24 @@ var NotFoundCommodity = Commodity{
 	Investment_Proportion:       0,
 }
 
-func (p Pair) Display() string {
-	return fmt.Sprintf("%0.2f", p.Viewed)
+func (p Pair) Display() template.HTML {
+	var htmlString string
+	if p.Viewed == p.Compared {
+		htmlString = fmt.Sprintf("<td style=\"text-align:right\">%0.2f</td>", p.Viewed)
+	} else {
+		htmlString = fmt.Sprintf("<td style=\"text-align:right; color:red\">%0.2f</td>", p.Viewed)
+	}
+	return template.HTML(htmlString)
+}
+
+func (p Pair) DisplayRounded() template.HTML {
+	var htmlString string
+	if p.Viewed == p.Compared {
+		htmlString = fmt.Sprintf("<td style=\"text-align:right\">%.0f</td>", p.Viewed)
+	} else {
+		htmlString = fmt.Sprintf("<td style=\"text-align:right; color:red\">%.0f</td>", p.Viewed)
+	}
+	return template.HTML(htmlString)
 }
 
 // returns the money stock of the given industry

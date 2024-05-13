@@ -39,15 +39,15 @@
           {{ else if eq .Usage "Useless"}}<i class="fas fa-skull-crossbones" style="font-weight: bolder; color:black"></i>
           {{ end }}
         </td>
-        <td style="text-align:right">{{ .Size.Display }}</td>
-        <td style="text-align:right">{{ .Total_Value.Display }}</td>
-        <td style="text-align:right">{{ .Total_Price.Display }}</td>
-        <td style="text-align:right">{{ .Unit_Value.Display }}</td>
-        <td style="text-align:right">{{ .Unit_Price.Display }}</td>
-        <td style="text-align:right">{{ .Turnover_Time.Display }}</td>
-        <td style="text-align:right">{{ .Demand.Display }}</td>
-        <td style="text-align:right">{{ .Supply.Display }}</td>
-        <td style="text-align:right">{{ .Allocation_Ratio.Display }}</td>
+        {{ .Size.DisplayRounded }}
+        {{ .Total_Value.DisplayRounded }}
+        {{ .Total_Price.DisplayRounded }}
+        {{ .Unit_Value.Display }}
+        {{ .Unit_Price.Display }}
+        {{ .Turnover_Time.Display }}
+        {{ .Demand.DisplayRounded }}
+        {{ .Supply.DisplayRounded }}
+        {{ .Allocation_Ratio.Display }}
       </tr>
       {{end}}
     </tbody>
