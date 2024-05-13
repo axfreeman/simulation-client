@@ -144,6 +144,8 @@ func ShowIndustries(ctx *gin.Context) {
 	state := user.Get_current_state()
 	industryViews := user.IndustryViews()
 
+	fmt.Println(industryViews)
+
 	ctx.HTML(http.StatusOK, "industries.html", gin.H{
 		"Title":         "Industries",
 		"industries":    user.Industries(),

@@ -107,7 +107,7 @@ type Industry struct {
 type IndustryView struct {
 	Id                 int
 	Name               string
-	UserName           string
+	OutputCommodityId  int
 	Output             string
 	Output_Scale       Pair
 	Output_Growth_Rate Pair

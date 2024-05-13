@@ -400,6 +400,7 @@ func NewIndustryView(v *Industry, c *Industry) *IndustryView {
 		Id:                 v.Id,
 		Name:               v.Name,
 		Output:             v.Output,
+		OutputCommodityId:  v.OutputCommodity().Id,
 		Output_Scale:       Pair{Viewed: (v.Output_Scale), Compared: (c.Output_Scale)},
 		Output_Growth_Rate: Pair{Viewed: (v.Output_Growth_Rate), Compared: (c.Output_Growth_Rate)},
 		Initial_Capital:    Pair{Viewed: (v.Initial_Capital), Compared: (c.Initial_Capital)},
