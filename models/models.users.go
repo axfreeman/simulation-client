@@ -114,6 +114,12 @@ func (u User) Industries() *[]Industry {
 	return (*u.Datasets[u.ViewedTimeStamp])["industries"].DataList.(*[]Industry)
 }
 
+func (u User) IndustryViews() *[]IndustryView {
+	v := (*u.Datasets[u.ViewedTimeStamp])["industries"].DataList.(*[]Industry)
+	c := (*u.Datasets[u.ComparatorTimeStamp])["industries"].DataList.(*[]Industry)
+	return NewIndustryViews(v, c)
+}
+
 func (u User) Classes() *[]Class {
 	return (*u.Datasets[u.ViewedTimeStamp])["classes"].DataList.(*[]Class)
 }

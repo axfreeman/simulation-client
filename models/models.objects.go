@@ -104,6 +104,20 @@ type Industry struct {
 	Profit_Rate        float32 `json:"profit_rate"`
 }
 
+type IndustryView struct {
+	Id                 int
+	Name               string
+	UserName           string
+	Output             string
+	Output_Scale       Pair
+	Output_Growth_Rate Pair
+	Initial_Capital    Pair
+	Work_In_Progress   Pair
+	Current_Capital    Pair
+	Profit             Pair
+	Profit_Rate        Pair
+}
+
 type Class struct {
 	Id                  int    `json:"id" gorm:"primary_key"`
 	Name                string `json:"name"`

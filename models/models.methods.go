@@ -384,10 +384,38 @@ func NewCommodityView(v *Commodity, c *Commodity) *CommodityView {
 }
 
 func NewCommodityViews(v *[]Commodity, c *[]Commodity) *[]CommodityView {
-	var newCommodityViews = make([]CommodityView, len(*v))
+	var newViews = make([]CommodityView, len(*v))
 	for i := range *v {
-		newCommodityView := NewCommodityView(&(*v)[i], &(*c)[i])
-		newCommodityViews[i] = *newCommodityView
+		newView := NewCommodityView(&(*v)[i], &(*c)[i])
+		newViews[i] = *newView
 	}
-	return &newCommodityViews
+	return &newViews
+}
+
+// Create an IndustryView object for display in a template
+// taking data from two Industry objects; one being viewed now,
+// the other showing the state of the simulation at some time in the 'past'
+func NewIndustryView(v *Industry, c *Industry) *IndustryView {
+	newView := IndustryView{
+		Id:                 v.Id,
+		Name:               v.Name,
+		Output:             v.Output,
+		Output_Scale:       Pair{Viewed: (v.Output_Scale), Compared: (c.Output_Scale)},
+		Output_Growth_Rate: Pair{Viewed: (v.Output_Growth_Rate), Compared: (c.Output_Growth_Rate)},
+		Initial_Capital:    Pair{Viewed: (v.Initial_Capital), Compared: (c.Initial_Capital)},
+		Work_In_Progress:   Pair{Viewed: (v.Work_In_Progress), Compared: (c.Work_In_Progress)},
+		Current_Capital:    Pair{Viewed: (v.Current_Capital), Compared: (c.Current_Capital)},
+		Profit:             Pair{Viewed: (v.Profit), Compared: (c.Profit)},
+		Profit_Rate:        Pair{Viewed: (v.Profit_Rate), Compared: (c.Profit_Rate)},
+	}
+	return &newView
+}
+
+func NewIndustryViews(v *[]Industry, c *[]Industry) *[]IndustryView {
+	var newViews = make([]IndustryView, len(*v))
+	for i := range *v {
+		newView := NewIndustryView(&(*v)[i], &(*c)[i])
+		newViews[i] = *newView
+	}
+	return &newViews
 }
