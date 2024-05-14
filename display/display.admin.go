@@ -6,6 +6,7 @@ package display
 import (
 	"capfront/models"
 	"capfront/utils"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,18 +16,13 @@ import (
 func AdminDashboard(ctx *gin.Context) {
 	username, err := synchWithServer(ctx)
 	if err != nil {
-		utils.DisplayError(ctx, " Could not retrieve Data to delete a simulation ")
+		utils.DisplayError(ctx, fmt.Sprintf(" Could not retrieve user Data for user %s \n", username))
 		return
 	}
 
-	if username != "admin" {
-		utils.DisplayError(ctx, "Only the administrator can see the admin dashboard")
-		return
-	}
 	ctx.HTML(http.StatusOK, "admin-dashboard.html", gin.H{
-		"Title":    "Admin Dashboard",
-		"users":    models.Users,
-		"username": username,
+		"Title": "Admin Dashboard",
+		"users": models.AdminUserList,
 	})
 }
 
