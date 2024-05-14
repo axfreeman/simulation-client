@@ -114,6 +114,10 @@ type IndustryView struct {
 	Initial_Capital    Pair
 	Work_In_Progress   Pair
 	Current_Capital    Pair
+	ConstantCapital    Pair
+	VariableCapital    Pair
+	MoneyStock         Pair
+	SalesStock         Pair
 	Profit             Pair
 	Profit_Rate        Pair
 }

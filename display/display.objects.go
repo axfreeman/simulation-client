@@ -262,12 +262,14 @@ func ShowIndexPage(ctx *gin.Context) {
 	ilist := u.Industries()
 	cllist := u.Classes()
 	commodityViews := u.CommodityViews()
+	industryViews := u.IndustryViews()
 
 	ctx.HTML(http.StatusOK, "index.html", gin.H{
 		"Title":          "Economy",
 		"industries":     ilist,
 		"commodities":    clist,
 		"commodityViews": commodityViews,
+		"industryViews":  industryViews,
 		"classes":        cllist,
 		"username":       username,
 		"state":          state,

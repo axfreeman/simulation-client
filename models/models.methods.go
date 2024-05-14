@@ -3,6 +3,8 @@
 package models
 
 import (
+	"capfront/utils"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -406,9 +408,16 @@ func NewIndustryView(v *Industry, c *Industry) *IndustryView {
 		Initial_Capital:    Pair{Viewed: (v.Initial_Capital), Compared: (c.Initial_Capital)},
 		Work_In_Progress:   Pair{Viewed: (v.Work_In_Progress), Compared: (c.Work_In_Progress)},
 		Current_Capital:    Pair{Viewed: (v.Current_Capital), Compared: (c.Current_Capital)},
+		ConstantCapital:    Pair{Viewed: (v.ConstantCapital().Size), Compared: (c.ConstantCapital().Size)},
+		VariableCapital:    Pair{Viewed: (v.VariableCapital().Size), Compared: (c.VariableCapital().Size)},
+		MoneyStock:         Pair{Viewed: (v.MoneyStock().Size), Compared: (c.MoneyStock().Size)},
+		SalesStock:         Pair{Viewed: (v.SalesStock().Size), Compared: (c.SalesStock().Size)},
 		Profit:             Pair{Viewed: (v.Profit), Compared: (c.Profit)},
 		Profit_Rate:        Pair{Viewed: (v.Profit_Rate), Compared: (c.Profit_Rate)},
 	}
+
+	newViewAsString, _ := json.MarshalIndent(newView, " ", " ")
+	utils.Trace(utils.BrightCyan, "  Industry view is\n"+string(newViewAsString))
 	return &newView
 }
 
