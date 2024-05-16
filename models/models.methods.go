@@ -86,9 +86,9 @@ func (p Pair) Display() template.HTML {
 func (p Pair) DisplayRounded() template.HTML {
 	var htmlString string
 	if p.Viewed == p.Compared {
-		htmlString = fmt.Sprintf("<td style=\"text-align:right\">%.0f</td>", p.Viewed)
+		htmlString = fmt.Sprintf("<td style=\"text-align:center\">%.0f</td>", p.Viewed)
 	} else {
-		htmlString = fmt.Sprintf("<td style=\"text-align:right; color:red\">%.0f</td>", p.Viewed)
+		htmlString = fmt.Sprintf("<td style=\"text-align:center; color:red\">%.0f</td>", p.Viewed)
 	}
 	return template.HTML(htmlString)
 }
