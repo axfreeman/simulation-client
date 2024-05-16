@@ -1,32 +1,25 @@
 {{ template "header.html" .}}
 
-<div class="w3-section w3-card-4 w3-serif" style="width:fit-content; margin:auto">
-
-
-<div class="w3-row w3-border">
-  <div class="w3-container w3-half">
-    {{ template "industry-table-sizes.html" .}}
+<div class="w3-section w3-serif" style="width:fit-content; margin:auto">
+  <div class="w3-row ">
+    <div class="w3-container w3-half">
+      {{ template "industry-table-sizes.html" .}}
+    </div>
+    <div class="w3-container w3-half">
+      {{ template "industry-table-values.html" .}}
+    </div>
   </div>
-  <div class="w3-container w3-half">
-    {{ template "industry-table-values.html" .}}
+  {{ template "industry-table-prices.html" .}}
+  <div class="w3-row ">
+    <div class="w3-container w3-half">
+      {{ template "class-table-sizes.html" .}}
+    </div>
+    <div class="w3-container w3-half">
+      {{ template "class-table-values.html" .}}
+    </div>
   </div>
-</div>
-{{ template "industry-table-prices.html" .}}
-<div class="w3-row w3-border">
-  <div class="w3-container w3-half">
-    {{ template "class-table-sizes.html" .}}
-  </div>
-  <div class="w3-container w3-half">
-    {{ template "class-table-values.html" .}}
-  </div>
-</div>
-{{ template "class-table-prices.html" .}}
-
-
-
-  <div >{{ template "commodity-table.html" .}}</div>
-
-
+  {{ template "class-table-prices.html" .}}
+  <div>{{ template "commodity-table.html" .}}</div>
 </div>
 <!--Embed the footer.html template at this location-->
 {{ template "footer.html" .}}
