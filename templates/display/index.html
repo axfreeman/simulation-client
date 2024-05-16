@@ -1,13 +1,24 @@
 {{ template "header.html" .}}
-
-
-
+<div class="w3-row w3-border">
+  <div class="w3-container w3-half">
     {{ template "industry-table-sizes.html" .}}
+  </div>
+  <div class="w3-container w3-half">
     {{ template "industry-table-values.html" .}}
-    {{ template "industry-table-prices.html" .}}
+  </div>
+</div>
+{{ template "industry-table-prices.html" .}}
+<div class="w3-row w3-border">
+  <div class="w3-container w3-half">
     {{ template "class-table-sizes.html" .}}
+  </div>
+  <div class="w3-container w3-half">
     {{ template "class-table-values.html" .}}
-    {{ template "class-table-prices.html" .}}
+  </div>
+</div>
+{{ template "class-table-prices.html" .}}
+
+
 
   <div >{{ template "commodity-table.html" .}}</div>
 
