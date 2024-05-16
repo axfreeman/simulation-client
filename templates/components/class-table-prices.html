@@ -1,15 +1,15 @@
-<div class="w3-section w3-card-4 w3-serif" style=" margin:auto">
+<div class="w3-section w3-card-4 w3-serif" style="width:75%; margin:auto">
   <header class="w3-container w3-blue">
     <h4 class="w3-center"> Class Prices </h4>
   </header>
 
-  <table class="table table-striped w-auto"id="class-prices">
+  <table >
     <thead>
       <tr>
-        <th style="width:30%">Name</th>
-        <th style="text-align:center; width:30%">Consumption</th>
-        <th style="text-align:center; width:30%">Money</th>
-        <th style="text-align:center; width:30%">Sales</th>
+        <th style="width:15%">Name</th>
+        <th style="text-align:center; width:10%">Consumption</th>
+        <th style="text-align:center; width:10%">Money</th>
+        <th style="text-align:center; width:10%">Sales</th>
       </tr>
     </thead>
     <tbody>
@@ -19,8 +19,8 @@
       <tr>
         <td style="text-align:left"><a href="/class/{{.Id}}">{{ .Name }}</a></td>
         <td style="text-align:center">{{ .ConsumerGood.Price }}</td>
-        <td style="text-align:right">{{ .MoneyStock.Price }}</td>
-        <td style="text-align:right">{{ .SalesStock.Price }}</td>
+        <td style="text-align:center">{{ .MoneyStock.Price }}</td>
+        <td style="text-align:center">{{ .SalesStock.Price }}</td>
       </tr>
       {{end}}
     </tbody>
