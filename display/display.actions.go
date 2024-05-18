@@ -181,6 +181,8 @@ func CreateSimulation(ctx *gin.Context) {
 	Router.HandleContext(ctx)
 }
 
+// Display the previous state of the simulation
+// Do nothing if we are already at the earliest stage
 func Back(ctx *gin.Context) {
 	utils.Trace(utils.Purple, "Back was requested\n")
 	username := utils.GUESTUSER
@@ -192,6 +194,7 @@ func Back(ctx *gin.Context) {
 		user.ComparatorTimeStamp--
 	}
 
+	utils.Trace(utils.Purple, fmt.Sprintf("Viewing %d with comparator %d\n", user.ViewedTimeStamp, user.ComparatorTimeStamp))
 	lastVisitedPage := user.LastVisitedPage
 
 	if useLastVisited(lastVisitedPage) {
@@ -202,14 +205,21 @@ func Back(ctx *gin.Context) {
 	Router.HandleContext(ctx)
 }
 
+// Display the next state of the simulation
+// Do nothing if we are already viewing the most recent state
+// Ensure the comparator stamp is one step behind the view stamp
 func Forward(ctx *gin.Context) {
 	utils.Trace(utils.Purple, "Forward was requested\n")
 	username := utils.GUESTUSER
 	user := models.Users[username] // Should we test for non-existing user?
 	if user.ViewedTimeStamp < user.TimeStamp {
 		user.ViewedTimeStamp++
+	}
+	if user.ComparatorTimeStamp != 0 {
 		user.ComparatorTimeStamp++
 	}
+
+	utils.Trace(utils.Purple, fmt.Sprintf("Viewing %d with comparator %d\n", user.ViewedTimeStamp, user.ComparatorTimeStamp))
 	lastVisitedPage := user.LastVisitedPage
 
 	if useLastVisited(lastVisitedPage) {
