@@ -1,66 +1,68 @@
 <!--menu.html-->
-<div style="width:100%; margin:auto; background-color:white">
-  <div class="w3-dropdown-hover w3-bar-item">
-    <div class="w3-xlarge w3-margin-right w3-margin-left"><i class="fa fa-bars"></i></div>
-    <div class="w3-dropdown-content w3-bar-block w3-card-4">
-      <a class=" w3-button  w3-bar-item" href="/">Home</a>
-      <a class=" w3-button  w3-bar-item" href="/user/dashboard">Dashboard</a>
-      <a class=" w3-button  w3-bar-item" href="/data">Data</a>
-      <a class=" w3-button  w3-bar-item" href="/admin/dashboard">Admin</a>
+<div class="w3-top">
+  <div class="w3-bar w3-metro-light-blue">
+    <div class="w3-dropdown-hover w3-bar-item">
+      <div class="w3-xlarge w3-margin-right w3-margin-left"><i class="fa fa-bars"></i></div>
+      <div class="w3-dropdown-content w3-bar-block w3-card-4">
+        <a class=" w3-button  w3-bar-item" href="/">Home</a>
+        <a class=" w3-button  w3-bar-item" href="/user/dashboard">Dashboard</a>
+        <a class=" w3-button  w3-bar-item" href="/data">Data</a>
+        <a class=" w3-button  w3-bar-item" href="/admin/dashboard">Admin</a>
+      </div>
     </div>
-  </div>
 
-  <div class="w3-dropdown-hover w3-bar-item">
-    <div class="w3-xlarge w3-margin-left w3-margin-right"><i class="fa fa-table"></i></div>
-    <div class="w3-dropdown-content w3-bar-block w3-card-4">
-      <a class=" w3-button  " href="/commodities">Commodities</a>
-      <a class=" w3-button  " href="/industries">Industries</a>
-      <a class=" w3-button  " href="/classes">Classes</a>
-      <a class=" w3-button  " href="/industry_stocks">Industry Stocks</a>
-      <a class=" w3-button  " href="/class_stocks">Class Stocks</a>
+    <div class="w3-dropdown-hover w3-bar-item">
+      <div class="w3-xlarge w3-margin-left w3-margin-right"><i class="fa fa-table"></i></div>
+      <div class="w3-dropdown-content w3-bar-block w3-card-4">
+        <a class=" w3-button  w3-bar-item" href="/commodities">Commodities</a>
+        <a class=" w3-button  w3-bar-item" href="/industries">Industries</a>
+        <a class=" w3-button  w3-bar-item" href="/classes">Classes</a>
+        <a class=" w3-button  w3-bar-item" href="/industry_stocks">Industry Stocks</a>
+        <a class=" w3-button  w3-bar-item" href="/class_stocks">Class Stocks</a>
+      </div>
     </div>
-  </div>
 
-  <div class="w3-dropdown-hover w3-bar-item">
-    <div class="w3-xlarge w3-margin-left w3-margin-right"><i class="fa fa-refresh"></i></div>
-    <div class="w3-dropdown-content w3-bar-block w3-card-4">
-      {{ if eq .state "DEMAND" }}
-      <a class=" w3-button  " href="/action/demand">Demand</a>
-      {{ else }}
-      <a class=" w3-button w3-disabled  ">Demand</a>
-      {{ end }}
+    <div class="w3-dropdown-hover w3-bar-item">
+      <div class="w3-xlarge w3-margin-left w3-margin-right"><i class="fa fa-refresh"></i></div>
+      <div class="w3-dropdown-content w3-bar-block w3-card-4">
+        {{ if eq .state "DEMAND" }}
+        <a class=" w3-button w3-bar-item " href="/action/demand">Demand</a>
+        {{ else }}
+        <a class=" w3-button w3-disabled w3-bar-item ">Demand</a>
+        {{ end }}
 
-      {{ if eq .state "SUPPLY"}}
-      <a class=" w3-button  " href="/action/supply">Supply</a>
-      {{ else }}
-      <a class=" w3-button w3-disabled  ">Supply</a>
-      {{ end }}
+        {{ if eq .state "SUPPLY"}}
+        <a class=" w3-button  w3-bar-item" href="/action/supply">Supply</a>
+        {{ else }}
+        <a class=" w3-button w3-disabled w3-bar-item ">Supply</a>
+        {{ end }}
 
-      {{ if eq .state "TRADE"}}
-      <a class=" w3-button  " href="/action/trade">Trade</a>
-      {{ else }}
-      <a class=" w3-button w3-disabled  ">Trade</a>
-      {{ end }}
+        {{ if eq .state "TRADE"}}
+        <a class=" w3-button  w3-bar-item" href="/action/trade">Trade</a>
+        {{ else }}
+        <a class=" w3-button w3-disabled w3-bar-item ">Trade</a>
+        {{ end }}
 
-      {{ if eq .state "PRODUCE"}}
-      <a class=" w3-button  " href="/action/produce">Produce</a>
-      {{ else }}
-      <a class=" w3-button w3-disabled  ">Produce</a>
-      {{ end }}
+        {{ if eq .state "PRODUCE"}}
+        <a class=" w3-button  w3-bar-item" href="/action/produce">Produce</a>
+        {{ else }}
+        <a class=" w3-button w3-disabled w3-bar-item ">Produce</a>
+        {{ end }}
 
-      {{ if eq .state "CONSUME"}}
-      <a class=" w3-button  " href="/action/consume">Consume</a>
-      {{ else }}
-      <a class=" w3-button w3-disabled  ">Consume</a>
-      {{ end }}
+        {{ if eq .state "CONSUME"}}
+        <a class=" w3-button  w3-bar-item" href="/action/consume">Consume</a>
+        {{ else }}
+        <a class=" w3-button w3-disabled w3-bar-item ">Consume</a>
+        {{ end }}
 
-      {{ if eq .state "INVEST"}}
-      <a class=" w3-button  " href="/action/invest">Invest</a>
-      {{ else }}
-      <a class=" w3-button w3-disabled  ">Invest</a>
-      {{ end }}
+        {{ if eq .state "INVEST"}}
+        <a class=" w3-button  w3-bar-item" href="/action/invest">Invest</a>
+        {{ else }}
+        <a class=" w3-button w3-disabled w3-bar-item ">Invest</a>
+        {{ end }}
+      </div>
     </div>
+    <a class=" w3-button  " href="/back"><i class="fas fa-arrow-left"></i> </a>
+    <a class=" w3-button  " href="/forward"><i class="fas fa-arrow-right"></i></a>
   </div>
-  <a class=" w3-button  " href="/back"><i class="fas fa-arrow-left"></i> </a>
-  <a class=" w3-button  " href="/forward"><i class="fas fa-arrow-right"></i></a>
 </div>
