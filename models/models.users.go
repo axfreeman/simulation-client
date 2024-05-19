@@ -3,7 +3,12 @@
 
 package models
 
-import "capfront/api"
+import (
+	"capfront/api"
+	"capfront/utils"
+	"encoding/json"
+	"fmt"
+)
 
 // Full details of a user.
 type User struct {
@@ -117,6 +122,17 @@ func (u User) Industries() *[]Industry {
 func (u User) IndustryViews() *[]IndustryView {
 	v := (*u.Datasets[u.ViewedTimeStamp])["industries"].DataList.(*[]Industry)
 	c := (*u.Datasets[u.ComparatorTimeStamp])["industries"].DataList.(*[]Industry)
+
+	fmt.Printf("Constructing Industry Views with ViewedTimeStamp %d and ComparatorTimeStamp %d", u.ViewedTimeStamp, u.ComparatorTimeStamp)
+	vAsString, _ := json.MarshalIndent(v, " ", " ")
+	cAsString, _ := json.MarshalIndent(c, " ", " ")
+
+	fmt.Println("Viewed Industry:")
+	utils.Trace(utils.Green, string(vAsString))
+
+	fmt.Println("Compared Industry:")
+	utils.Trace(utils.BrightGreen, string(cAsString))
+
 	return NewIndustryViews(v, c)
 }
 

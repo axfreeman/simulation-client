@@ -264,6 +264,9 @@ func ShowIndexPage(ctx *gin.Context) {
 	commodityViews := u.CommodityViews()
 	industryViews := u.IndustryViews()
 
+	// industryViewAsString, _ := json.MarshalIndent(industryViews, " ", " ")
+	// utils.Trace(utils.BrightCyan, "  Industry view before displaying index page is\n"+string(industryViewAsString)+"/n")
+
 	ctx.HTML(http.StatusOK, "index.html", gin.H{
 		"Title":          "Economy",
 		"industries":     ilist,

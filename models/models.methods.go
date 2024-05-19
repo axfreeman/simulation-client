@@ -3,8 +3,6 @@
 package models
 
 import (
-	"capfront/utils"
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -416,8 +414,8 @@ func NewIndustryView(v *Industry, c *Industry) *IndustryView {
 		Profit_Rate:        Pair{Viewed: (v.Profit_Rate), Compared: (c.Profit_Rate)},
 	}
 
-	newViewAsString, _ := json.MarshalIndent(newView, " ", " ")
-	utils.Trace(utils.BrightCyan, "  Industry view is\n"+string(newViewAsString))
+	// newViewAsString, _ := json.MarshalIndent(newView, " ", " ")
+	// utils.Trace(utils.BrightCyan, "  Industry view is\n"+string(newViewAsString))
 	return &newView
 }
 
