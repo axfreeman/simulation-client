@@ -123,15 +123,18 @@ func (u User) IndustryViews() *[]IndustryView {
 	v := (*u.Datasets[u.ViewedTimeStamp])["industries"].DataList.(*[]Industry)
 	c := (*u.Datasets[u.ComparatorTimeStamp])["industries"].DataList.(*[]Industry)
 
-	fmt.Printf("Constructing Industry Views with ViewedTimeStamp %d and ComparatorTimeStamp %d", u.ViewedTimeStamp, u.ComparatorTimeStamp)
+	fmt.Printf("Constructing Industry Views with ViewedTimeStamp %d and ComparatorTimeStamp %d\n", u.ViewedTimeStamp, u.ComparatorTimeStamp)
 	vAsString, _ := json.MarshalIndent(v, " ", " ")
 	cAsString, _ := json.MarshalIndent(c, " ", " ")
 
 	fmt.Println("Viewed Industry:")
-	utils.Trace(utils.Green, string(vAsString))
+	utils.Trace(utils.Green, string(vAsString)+"\n")
 
 	fmt.Println("Compared Industry:")
 	utils.Trace(utils.BrightGreen, string(cAsString))
+
+	fmt.Println("Constant Capital of Viewed Industry:", (*v)[0].ConstantCapital())
+	fmt.Println("Constant Capital of Compared Industry:", (*c)[0].ConstantCapital())
 
 	return NewIndustryViews(v, c)
 }
