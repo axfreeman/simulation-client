@@ -15,14 +15,14 @@
     </thead>
     <tbody>
       <!--Loop over the industries -->
-      {{range .industries }}
+      {{range .industryViews }}
 
       <tr>
         <td style="text-align: left"><a href="/industry/{{.Id}}">{{ .Name }}</a></td>
-        <td style="text-align:center">{{ .ConstantCapital.Value }}</td>
-        <td style="text-align:center">{{ .VariableCapital.Value}}</td>
-        <td style="text-align:center">{{ .MoneyStock.Value}}</td>
-        <td style="text-align:center">{{ .SalesStock.Value}}</td>
+        {{ .ConstantCapitalValue.DisplayRounded }}
+        {{ .VariableCapitalValue.DisplayRounded}}
+        {{ .MoneyStockValue.DisplayRounded}}
+        {{ .SalesStockValue.DisplayRounded}}
       </tr>
       {{end}}
     </tbody>

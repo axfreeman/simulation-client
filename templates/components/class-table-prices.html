@@ -14,13 +14,13 @@
     </thead>
     <tbody>
       <!--Loop over the classes -->
-      {{range .classes }}
+      {{range .classViews }}
 
       <tr>
         <td style="text-align:left"><a href="/class/{{.Id}}">{{ .Name }}</a></td>
-        <td style="text-align:center">{{ .ConsumerGood.Price }}</td>
-        <td style="text-align:center">{{ .MoneyStock.Price }}</td>
-        <td style="text-align:center">{{ .SalesStock.Price }}</td>
+        {{ .ConsumptionStockPrice.DisplayRounded }}
+        {{ .MoneyStockPrice.DisplayRounded }}
+        {{ .SalesStockPrice.DisplayRounded }}
       </tr>
       {{end}}
     </tbody>

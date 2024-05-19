@@ -105,21 +105,29 @@ type Industry struct {
 }
 
 type IndustryView struct {
-	Id                 int
-	Name               string
-	OutputCommodityId  int
-	Output             string
-	Output_Scale       Pair
-	Output_Growth_Rate Pair
-	Initial_Capital    Pair
-	Work_In_Progress   Pair
-	Current_Capital    Pair
-	ConstantCapital    Pair
-	VariableCapital    Pair
-	MoneyStock         Pair
-	SalesStock         Pair
-	Profit             Pair
-	Profit_Rate        Pair
+	Id                   int
+	Name                 string
+	OutputCommodityId    int
+	Output               string
+	Output_Scale         Pair
+	Output_Growth_Rate   Pair
+	Initial_Capital      Pair
+	Work_In_Progress     Pair
+	Current_Capital      Pair
+	ConstantCapitalSize  Pair
+	ConstantCapitalValue Pair
+	ConstantCapitalPrice Pair
+	VariableCapitalSize  Pair
+	VariableCapitalValue Pair
+	VariableCapitalPrice Pair
+	MoneyStockSize       Pair
+	MoneyStockValue      Pair
+	MoneyStockPrice      Pair
+	SalesStockSize       Pair
+	SalesStockValue      Pair
+	SalesStockPrice      Pair
+	Profit               Pair
+	Profit_Rate          Pair
 }
 
 type Class struct {
@@ -133,6 +141,28 @@ type Class struct {
 	Consumption_Ratio   float32 `json:"consumption_ratio"`
 	Revenue             float32 `json:"revenue"`
 	Assets              float32 `json:"assets"`
+}
+
+type ClassView struct {
+	Id                    int
+	Name                  string
+	Simulation_id         int32
+	Time_Stamp            int
+	UserName              string
+	Population            Pair
+	Participation_Ratio   float32
+	Consumption_Ratio     float32
+	Revenue               Pair
+	Assets                Pair
+	ConsumptionStockSize  Pair
+	ConsumptionStockValue Pair
+	ConsumptionStockPrice Pair
+	MoneyStockSize        Pair
+	MoneyStockValue       Pair
+	MoneyStockPrice       Pair
+	SalesStockSize        Pair
+	SalesStockValue       Pair
+	SalesStockPrice       Pair
 }
 
 type Industry_Stock struct {

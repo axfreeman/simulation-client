@@ -144,8 +144,6 @@ func ShowIndustries(ctx *gin.Context) {
 	state := user.Get_current_state()
 	industryViews := user.IndustryViews()
 
-	fmt.Println(industryViews)
-
 	ctx.HTML(http.StatusOK, "industries.html", gin.H{
 		"Title":         "Industries",
 		"industries":    user.Industries(),
@@ -162,12 +160,20 @@ func ShowClasses(ctx *gin.Context) {
 		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display Classes ")
 		return
 	}
+
+	user := models.Users[username]
 	state := models.Users[username].Get_current_state()
+	classViews := user.ClassViews()
+
+	classViewAsString, _ := json.MarshalIndent(classViews, " ", " ")
+	utils.Trace(utils.Cyan, fmt.Sprintf("Class Views:\n%s\n ", string(classViewAsString)))
+
 	ctx.HTML(http.StatusOK, "classes.html", gin.H{
-		"Title":    "Classes",
-		"classes":  models.Users[username].Classes(),
-		"username": username,
-		"state":    state,
+		"Title":      "Classes",
+		"classes":    models.Users[username].Classes(),
+		"classViews": classViews,
+		"username":   username,
+		"state":      state,
 	})
 }
 
@@ -263,6 +269,7 @@ func ShowIndexPage(ctx *gin.Context) {
 	cllist := u.Classes()
 	commodityViews := u.CommodityViews()
 	industryViews := u.IndustryViews()
+	classViews := u.ClassViews()
 
 	// industryViewAsString, _ := json.MarshalIndent(industryViews, " ", " ")
 	// utils.Trace(utils.BrightCyan, "  Industry view before displaying index page is\n"+string(industryViewAsString)+"/n")
@@ -274,6 +281,7 @@ func ShowIndexPage(ctx *gin.Context) {
 		"commodityViews": commodityViews,
 		"industryViews":  industryViews,
 		"classes":        cllist,
+		"classViews":     classViews,
 		"username":       username,
 		"state":          state,
 	})
@@ -288,7 +296,7 @@ func ShowTrace(ctx *gin.Context) {
 	}
 
 	state := models.Users[username].Get_current_state()
-	tlist := *models.Users[username].Traces()
+	tlist := *models.Users[username].Traces(models.Users[username].ViewedTimeStamp)
 
 	ctx.HTML(
 		http.StatusOK,
@@ -367,7 +375,7 @@ func ShowIndustryStocks(ctx *gin.Context) {
 	log.Output(1, fmt.Sprintf("User %s wants to show industry stocks %d", username, id))
 
 	state := models.Users[username].Get_current_state()
-	islist := *models.Users[username].IndustryStocks()
+	islist := *models.Users[username].IndustryStocks(models.Users[username].ViewedTimeStamp)
 
 	ctx.HTML(http.StatusOK, "industry_stocks.html", gin.H{
 		"Title":    "Industry Stocks",
@@ -388,7 +396,7 @@ func ShowClassStocks(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	log.Output(1, fmt.Sprintf("User %s wants to show class stocks %d", username, id))
 	state := models.Users[username].Get_current_state()
-	cslist := *models.Users[username].ClassStocks()
+	cslist := *models.Users[username].ClassStocks(models.Users[username].ViewedTimeStamp)
 
 	ctx.HTML(http.StatusOK, "class_stocks.html", gin.H{
 		"Title":    "Class Stocks",

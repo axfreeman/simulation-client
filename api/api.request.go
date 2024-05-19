@@ -35,7 +35,7 @@ func ServerRequest(apiKey string, url string) ([]byte, error) {
 	client := &http.Client{Timeout: time.Second * 5} // Timeout after 5 seconds
 	res, _ := client.Do(resp)
 	if res == nil {
-		utils.Trace(utils.Red, "Server is down or misbehaving")
+		utils.Trace(utils.Red, "Server is down or misbehaving\n")
 		return nil, nil
 	}
 

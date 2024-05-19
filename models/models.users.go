@@ -5,9 +5,6 @@ package models
 
 import (
 	"capfront/api"
-	"capfront/utils"
-	"encoding/json"
-	"fmt"
 )
 
 // Full details of a user.
@@ -123,20 +120,27 @@ func (u User) IndustryViews() *[]IndustryView {
 	v := (*u.Datasets[u.ViewedTimeStamp])["industries"].DataList.(*[]Industry)
 	c := (*u.Datasets[u.ComparatorTimeStamp])["industries"].DataList.(*[]Industry)
 
-	fmt.Printf("Constructing Industry Views with ViewedTimeStamp %d and ComparatorTimeStamp %d\n", u.ViewedTimeStamp, u.ComparatorTimeStamp)
-	vAsString, _ := json.MarshalIndent(v, " ", " ")
-	cAsString, _ := json.MarshalIndent(c, " ", " ")
+	// fmt.Printf("Constructing Industry Views with ViewedTimeStamp %d and ComparatorTimeStamp %d\n", u.ViewedTimeStamp, u.ComparatorTimeStamp)
+	// vAsString, _ := json.MarshalIndent(v, " ", " ")
+	// cAsString, _ := json.MarshalIndent(c, " ", " ")
 
-	fmt.Println("Viewed Industry:")
-	utils.Trace(utils.Green, string(vAsString)+"\n")
+	// fmt.Println("Viewed Industry:")
+	// utils.Trace(utils.Green, string(vAsString)+"\n")
 
-	fmt.Println("Compared Industry:")
-	utils.Trace(utils.BrightGreen, string(cAsString))
+	// fmt.Println("Compared Industry:")
+	// utils.Trace(utils.BrightGreen, string(cAsString))
 
-	fmt.Println("Constant Capital of Viewed Industry:", (*v)[0].ConstantCapital())
-	fmt.Println("Constant Capital of Compared Industry:", (*c)[0].ConstantCapital())
+	// fmt.Printf("Constant Capital of Viewed Industry:\n%v\n", (*v)[0].ConstantCapital(u.ViewedTimeStamp))
+	// fmt.Printf("Constant Capital of Compared Industry:\n%v\n", (*c)[0].ConstantCapital(u.ComparatorTimeStamp))
 
-	return NewIndustryViews(v, c)
+	return NewIndustryViews(u.ViewedTimeStamp, u.ComparatorTimeStamp, v, c)
+}
+
+func (u User) ClassViews() *[]ClassView {
+	v := (*u.Datasets[u.ViewedTimeStamp])["classes"].DataList.(*[]Class)
+	c := (*u.Datasets[u.ComparatorTimeStamp])["classes"].DataList.(*[]Class)
+
+	return NewClassViews(u.ViewedTimeStamp, u.ComparatorTimeStamp, v, c)
 }
 
 func (u User) Classes() *[]Class {
@@ -144,16 +148,16 @@ func (u User) Classes() *[]Class {
 }
 
 // Wrapper for the IndustryStockList
-func (u User) IndustryStocks() *[]Industry_Stock {
-	return (*u.Datasets[u.ViewedTimeStamp])["industry stocks"].DataList.(*[]Industry_Stock)
+func (u User) IndustryStocks(timeStamp int) *[]Industry_Stock {
+	return (*u.Datasets[timeStamp])["industry stocks"].DataList.(*[]Industry_Stock)
 }
 
 // Wrapper for the ClassStockList
-func (u User) ClassStocks() *[]Class_Stock {
-	return (*u.Datasets[u.ViewedTimeStamp])["class stocks"].DataList.(*[]Class_Stock)
+func (u User) ClassStocks(timeStamp int) *[]Class_Stock {
+	return (*u.Datasets[timeStamp])["class stocks"].DataList.(*[]Class_Stock)
 }
 
 // Wrapper for the TraceList
-func (u User) Traces() *[]Trace {
-	return (*u.Datasets[u.ViewedTimeStamp])["trace"].DataList.(*[]Trace)
+func (u User) Traces(timeStamp int) *[]Trace {
+	return (*u.Datasets[timeStamp])["trace"].DataList.(*[]Trace)
 }
