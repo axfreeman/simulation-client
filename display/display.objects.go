@@ -119,6 +119,7 @@ func ShowCommodities(ctx *gin.Context) {
 		utils.DisplayError(ctx, " Could not retrieve data from Server while trying to display Commodities")
 		return
 	}
+
 	user := models.Users[username]
 	state := user.Get_current_state()
 	commodityViews := user.CommodityViews()
