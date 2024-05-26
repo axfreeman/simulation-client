@@ -68,10 +68,10 @@ func ActionHandler(ctx *gin.Context) {
 
 	// It is syntactically well-formed. Send it to the server.
 	act := ctx.Param("action")
-	username, _ := ctx.Get("user")
-	user := models.Users[username.(string)] // NOTE we assume the user exists in local storage
-	lastVisitedPage := user.LastVisitedPage
-	log.Output(1, fmt.Sprintf("User %s wants the server to implement action %s. The last visited page was %s\n", username, act, lastVisitedPage))
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
+	username := user.UserName
+	utils.Trace(utils.Yellow, fmt.Sprintf("User %s wants to perform action %s. Last visited page was %s\n", username, act, user.LastVisitedPage))
 
 	// Check that the server understood it.
 	_, err = api.ServerRequest(user.ApiKey, `action/`+act)
@@ -99,21 +99,21 @@ func ActionHandler(ctx *gin.Context) {
 	user.ViewedTimeStamp = user.TimeStamp
 
 	// Now refresh the data from the server
-	if !fetch.FetchUserObjects(ctx, username.(string)) {
+	if !fetch.FetchUserObjects(ctx, username) {
 		utils.DisplayError(ctx, "The server completed the action but did not send back any data.")
 	}
 
 	// Set the state so that the simulation can proceed to the next action.
-	set_current_state(username.(string), nextStates[act])
+	set_current_state(username, nextStates[act])
 
 	// If the user was looking at a page that displays (but does not act),
 	// redirect to it so the user can see the result of the action.
 	// If not, redirect to the Index page.
-	visitedPageURL := strings.Split(lastVisitedPage, "/")
-	log.Output(1, fmt.Sprintf("The last page this user visited was %v and this was split into%v", lastVisitedPage, visitedPageURL))
-	if useLastVisited(lastVisitedPage) {
+	visitedPageURL := strings.Split(user.LastVisitedPage, "/")
+	log.Output(1, fmt.Sprintf("The last page this user visited was %v and this was split into%v", user.LastVisitedPage, visitedPageURL))
+	if useLastVisited(user.LastVisitedPage) {
 		// utils.Trace(utils.Purple, fmt.Sprintf("User will be redirected to the last visited page which was %s\n", lastVisitedPage))
-		ctx.Request.URL.Path = lastVisitedPage
+		ctx.Request.URL.Path = user.LastVisitedPage
 	} else {
 		// utils.Trace(utils.Purple, "User will be redirected to the Index Page, because the last visited URL was not a display page")
 		ctx.Request.URL.Path = "/"
@@ -136,8 +136,9 @@ func CreateSimulation(ctx *gin.Context) {
 		utils.Trace(utils.Green, fmt.Sprintf(" Clone Simulation was called from %s#%d\n", file, no))
 	}
 
-	username, _ := ctx.Get("user")
-	user := models.Users[username.(string)] // NOTE we assume the user exists in local storage
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
+	username := user.UserName
 	t := ctx.Param("id")
 	id, _ := strconv.Atoi(t)
 	log.Output(1, fmt.Sprintf("Creating a simulation from template %d for user %s", id, username))
@@ -169,7 +170,7 @@ func CreateSimulation(ctx *gin.Context) {
 
 	// Fetch the whole (new) dataset from the server
 	// (until now we only told the server to create it - now we want it)
-	if !fetch.FetchUserObjects(ctx, username.(string)) {
+	if !fetch.FetchUserObjects(ctx, username) {
 		utils.DisplayError(ctx, "WARNING: though the server created a simulation, we could not retrieve all its data")
 	}
 	// Initialise the timeStamp so that we are viewing the first dataset.
@@ -186,8 +187,8 @@ func CreateSimulation(ctx *gin.Context) {
 // Do nothing if we are already at the earliest stage
 func Back(ctx *gin.Context) {
 	utils.Trace(utils.Purple, "Back was requested\n")
-	username, _ := ctx.Get("user")
-	user := models.Users[username.(string)] // NOTE we assume the user exists in local storage
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
 
 	if user.ViewedTimeStamp > 0 {
 		user.ViewedTimeStamp--
@@ -212,8 +213,8 @@ func Back(ctx *gin.Context) {
 // Ensure the comparator stamp is one step behind the view stamp
 func Forward(ctx *gin.Context) {
 	utils.Trace(utils.Purple, "Forward was requested\n")
-	username, _ := ctx.Get("user")
-	user := models.Users[username.(string)] // NOTE we assume the user exists in local storage
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
 	if user.ViewedTimeStamp < user.TimeStamp {
 		user.ViewedTimeStamp++
 	}

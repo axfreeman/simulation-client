@@ -149,12 +149,8 @@ func set_current_state(username string, new_state string) {
 
 // display all commodities in the current simulation
 func ShowCommodities(ctx *gin.Context) {
-	username, ok := ctx.Get("user")
-	if !ok {
-		return
-	}
-
-	user := models.Users[username.(string)]
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
 	state := user.Get_current_state()
 	commodityViews := user.CommodityViews()
 
@@ -162,19 +158,15 @@ func ShowCommodities(ctx *gin.Context) {
 		"Title":          "Commodities",
 		"commodities":    user.Commodities(),
 		"commodityViews": commodityViews,
-		"username":       username,
+		"username":       user.UserName,
 		"state":          state,
 	})
 }
 
 // display all industries in the current simulation
 func ShowIndustries(ctx *gin.Context) {
-	username, ok := ctx.Get("user")
-	if !ok {
-		return
-	}
-
-	user := models.Users[username.(string)]
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
 	state := user.Get_current_state()
 	industryViews := user.IndustryViews()
 
@@ -182,19 +174,15 @@ func ShowIndustries(ctx *gin.Context) {
 		"Title":         "Industries",
 		"industries":    user.Industries(),
 		"industryViews": industryViews,
-		"username":      username,
+		"username":      user.UserName,
 		"state":         state,
 	})
 }
 
 // display all classes in the current simulation
 func ShowClasses(ctx *gin.Context) {
-	username, ok := ctx.Get("user")
-	if !ok {
-		return
-	}
-
-	user := models.Users[username.(string)]
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
 	state := user.Get_current_state()
 	classViews := user.ClassViews()
 
@@ -205,30 +193,26 @@ func ShowClasses(ctx *gin.Context) {
 		"Title":      "Classes",
 		"classes":    user.Classes(),
 		"classViews": classViews,
-		"username":   username,
+		"username":   user.UserName,
 		"state":      state,
 	})
 }
 
 // Display one specific commodity
 func ShowCommodity(ctx *gin.Context) {
-	username, ok := ctx.Get("user")
-	if !ok {
-		return
-	}
-
-	user := models.Users[username.(string)]
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
 
 	state := user.Get_current_state()
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	clist := *models.Users[username.(string)].Commodities()
+	clist := *user.Commodities()
 	for i := 0; i < len(clist); i++ {
 		if id == clist[i].Id {
 			ctx.HTML(http.StatusOK, "commodity.html", gin.H{
 				"Title":     "Commodity",
 				"commodity": clist[i],
-				"username":  username,
+				"username":  user.UserName,
 				"state":     state,
 			})
 		}
@@ -237,22 +221,17 @@ func ShowCommodity(ctx *gin.Context) {
 
 // Display one specific industry
 func ShowIndustry(ctx *gin.Context) {
-	username, ok := ctx.Get("user")
-	if !ok {
-		return
-	}
-
-	// user := models.Users[username.(string)]
-
-	state := models.Users[username.(string)].Get_current_state()
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
+	state := user.Get_current_state()
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	ilist := *models.Users[username.(string)].Industries()
+	ilist := *user.Industries()
 	for i := 0; i < len(ilist); i++ {
 		if id == ilist[i].Id {
 			ctx.HTML(http.StatusOK, "industry.html", gin.H{
 				"Title":    "Industry",
 				"industry": ilist[i],
-				"username": username,
+				"username": user.UserName,
 				"state":    state,
 			})
 		}
@@ -261,12 +240,8 @@ func ShowIndustry(ctx *gin.Context) {
 
 // Display one specific class
 func ShowClass(ctx *gin.Context) {
-	username, ok := ctx.Get("user")
-	if !ok {
-		return
-	}
-
-	user := models.Users[username.(string)]
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
 
 	state := user.Get_current_state()
 	id, _ := strconv.Atoi(ctx.Param("id")) //TODO check user didn't do something stupid
@@ -277,7 +252,7 @@ func ShowClass(ctx *gin.Context) {
 			ctx.HTML(http.StatusOK, "class.html", gin.H{
 				"Title":    "Class",
 				"class":    list[i],
-				"username": username,
+				"username": user.UserName,
 				"state":    state,
 			})
 		}
@@ -293,13 +268,10 @@ func ShowIndexPage(ctx *gin.Context) {
 		utils.Trace(utils.Yellow, fmt.Sprintf(" ShowIndexPage was called from %s#%d\n", file, no))
 	}
 
-	username, ok := ctx.Get("user")
-	if !ok {
-		return
-	}
+	userobject, _ := ctx.Get("userobject")
+	u := userobject.(*models.User)
 
-	utils.Trace(utils.BrightMagenta, fmt.Sprintf("Got a user from the middleware. It was %s\n", username))
-	u := models.Users[username.(string)]
+	utils.Trace(utils.BrightMagenta, fmt.Sprintf("Got a user from the middleware. It was %s\n", u.UserName))
 	state := u.Get_current_state()
 	clist := u.Commodities()
 	ilist := u.Industries()
@@ -319,19 +291,15 @@ func ShowIndexPage(ctx *gin.Context) {
 		"industryViews":  industryViews,
 		"classes":        cllist,
 		"classViews":     classViews,
-		"username":       username,
+		"username":       u.UserName,
 		"state":          state,
 	})
 }
 
 // Fetch the trace from the local database
 func ShowTrace(ctx *gin.Context) {
-	username, ok := ctx.Get("user")
-	if !ok {
-		return
-	}
-
-	user := models.Users[username.(string)]
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
 	state := user.Get_current_state()
 	tlist := *user.Traces(user.ViewedTimeStamp)
 
@@ -341,7 +309,7 @@ func ShowTrace(ctx *gin.Context) {
 		gin.H{
 			"Title":    "Simulation Trace",
 			"trace":    tlist,
-			"username": username,
+			"username": user.UserName,
 			"state":    state,
 		},
 	)
@@ -354,13 +322,8 @@ func UserDashboard(ctx *gin.Context) {
 		utils.Trace(utils.Yellow, fmt.Sprintf(" User Dashboard was called from %s line #%d\n", file, no))
 	}
 
-	username, ok := ctx.Get("user")
-	if !ok {
-		return
-	}
-
-	user := models.Users[username.(string)]
-
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
 	state := user.Get_current_state()
 	slist := *user.Simulations()
 
@@ -368,7 +331,7 @@ func UserDashboard(ctx *gin.Context) {
 		"Title":       "Dashboard",
 		"simulations": slist,
 		"templates":   models.TemplateList,
-		"username":    username,
+		"username":    user.UserName,
 		"state":       state,
 	})
 }
@@ -380,13 +343,10 @@ func DataHandler(ctx *gin.Context) {
 
 // TODO not working yet
 func SwitchSimulation(ctx *gin.Context) {
-	username, ok := ctx.Get("user")
-	if !ok {
-		return
-	}
-
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	log.Output(1, fmt.Sprintf("User %s wants to switch to simulation %d", username, id))
+	log.Output(1, fmt.Sprintf("User %s wants to switch to simulation %d", user.UserName, id))
 	ctx.HTML(http.StatusOK, "notready.html", gin.H{
 		"Title": "Not Ready",
 	})
@@ -402,15 +362,11 @@ func RestartSimulation(ctx *gin.Context) {
 
 // display all industry stocks in the current simulation
 func ShowIndustryStocks(ctx *gin.Context) {
-	username, ok := ctx.Get("user")
-	if !ok {
-		return
-	}
-
-	user := models.Users[username.(string)]
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	log.Output(1, fmt.Sprintf("User %s wants to show industry stocks %d", username, id))
+	log.Output(1, fmt.Sprintf("User %s wants to show industry stocks %d", user.UserName, id))
 
 	state := user.Get_current_state()
 	islist := *user.IndustryStocks(user.ViewedTimeStamp)
@@ -418,29 +374,25 @@ func ShowIndustryStocks(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "industry_stocks.html", gin.H{
 		"Title":    "Industry Stocks",
 		"stocks":   islist,
-		"username": username,
+		"username": user.UserName,
 		"state":    state,
 	})
 }
 
 // display all the class stocks in the current simulation
 func ShowClassStocks(ctx *gin.Context) {
-	username, ok := ctx.Get("user")
-	if !ok {
-		return
-	}
-
-	user := models.Users[username.(string)]
+	userobject, _ := ctx.Get("userobject")
+	user := userobject.(*models.User)
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	log.Output(1, fmt.Sprintf("User %s wants to show class stocks %d", username, id))
+	log.Output(1, fmt.Sprintf("User %s wants to show class stocks %d", user.UserName, id))
 	state := user.Get_current_state()
 	cslist := *user.ClassStocks(user.ViewedTimeStamp)
 
 	ctx.HTML(http.StatusOK, "class_stocks.html", gin.H{
 		"Title":    "Class Stocks",
 		"stocks":   cslist,
-		"username": username,
+		"username": user.UserName,
 		"state":    state,
 	})
 }
