@@ -11,11 +11,16 @@ import (
 
 func main() {
 
-	display.Router.Use(api.Slogger())
+	display.Router.Use(api.Authorize())
 	display.Router.Use(gin.Recovery())
 
 	display.Router.LoadHTMLGlob("./templates/**/*") // load the templates
 	fmt.Println("Welcome to capitalism")
+
+	display.Router.GET("/admin/reset", display.AdminReset)
+	display.Router.GET("/admin/choose-players", display.Lock)
+
+	display.Router.GET("/admin/play-as/:username", display.SelectUser)
 
 	display.Router.GET("/action/:action", display.ActionHandler)
 
@@ -39,14 +44,14 @@ func main() {
 	display.Router.GET("/data/", display.DataHandler)
 	display.Router.GET("/user/dashboard", display.UserDashboard)
 	display.Router.GET("/admin/dashboard", display.AdminDashboard)
-	display.Router.GET("/admin/reset", display.AdminReset)
 
 	display.Router.GET("/back", display.Back)
 	display.Router.GET("/forward", display.Forward)
 
 	fetch.Initialise()
-	display.ListData()
+	// uncomment for more diagnostics
+	// display.ListData()
 
-	display.Router.Run() // Run the server
+	display.Router.Run("localhost:8080") // Run the server
 
 }

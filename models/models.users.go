@@ -18,6 +18,7 @@ type User struct {
 	ViewedTimeStamp     int            // Indexes Datasets. Selects what the user is viewing
 	ComparatorTimeStamp int            // Indexes Datasets. Selects what Viewed items are compared with.
 	Sim                 api.DataObject // Details of the current simulation
+	IsLocked            bool           `json:"is_locked"` // Is user currently authorized to talk to the server?
 }
 
 var Users = make(map[string]*User) // Every user's simulation data
