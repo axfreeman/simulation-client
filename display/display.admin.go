@@ -14,7 +14,7 @@ import (
 
 // Display the admin dashboard
 func AdminDashboard(ctx *gin.Context) {
-	username, err := synchWithServer(ctx)
+	username, err := SynchWithServer(ctx)
 	if err != nil {
 		utils.DisplayError(ctx, fmt.Sprintf(" Could not retrieve user Data for user %s \n", username))
 		return

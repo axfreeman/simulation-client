@@ -22,6 +22,15 @@ type DataObject struct {
 	DataList interface{}
 }
 
+// Retrieves the data for a single simulation object from the server.
+//
+//	Unmarshals the server response into the object
+//
+//	Return true if it worked
+//
+//	Return false if there was an error of any kind
+//
+//	TODO return an error code instead of a boolean
 func (d *DataObject) Fetch() bool {
 	response, err := ServerRequest(d.ApiKey, d.ApiUrl)
 

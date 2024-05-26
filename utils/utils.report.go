@@ -14,7 +14,9 @@ import (
 //	if TraceLevel is true, produce trace diagnostics
 var TraceLevel bool = true
 
-// function to provide details to help trace where things happened
+// Provide status information on simulation and authorization progress.
+//
+// TODO ONLY for development - replace by Logger calls at some point
 func Trace(startColour string, message string) {
 	if !TraceLevel {
 		return

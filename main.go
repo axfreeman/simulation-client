@@ -1,15 +1,20 @@
 package main
 
 import (
+	"capfront/api"
 	"capfront/display"
 	"capfront/fetch"
 	"fmt"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 
-	display.Router.LoadHTMLGlob("./templates/**/*") // load the templates
+	display.Router.Use(api.Slogger())
+	display.Router.Use(gin.Recovery())
 
+	display.Router.LoadHTMLGlob("./templates/**/*") // load the templates
 	fmt.Println("Welcome to capitalism")
 
 	display.Router.GET("/action/:action", display.ActionHandler)

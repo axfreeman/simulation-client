@@ -1,5 +1,8 @@
 # An unsystematic list of the sources and tutorials I looked at while developing this project
 
+## Gin docs
+* https://gin-gonic.com/docs/
+
 ## Minimal login
 * https://medium.com/@kamruljpi/user-authentication-in-go-web-applications-part-17-d50eeda051f2
 * https://dev.to/nikl/using-goland-and-gin-framework-to-build-restful-api-7-steps-2834

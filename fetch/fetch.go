@@ -20,15 +20,14 @@ import (
 
 // Iterates through ApiList to refresh all user objects for one user
 //
-// Returns: false if any table fails.
-//
-// Returns: true if all tables succeed.
+//	Returns: false if any table fails.
+//	Returns: true if all tables succeed.
 func FetchUserObjects(ctx *gin.Context, username string) bool {
 	user := models.Users[username]
 	if !user.Sim.Fetch() {
 		utils.Trace(utils.Red, "Sim did not fetch\n")
 	}
-
+	// Reminder: a dataset is a repository for all objects at one stage of the simulation.
 	dataSet := *user.Datasets[user.TimeStamp]
 
 	for key, value := range dataSet {

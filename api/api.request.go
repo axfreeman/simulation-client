@@ -10,6 +10,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 // Prepare and send a request for a protected service to the server
@@ -49,4 +51,14 @@ func ServerRequest(apiKey string, url string) ([]byte, error) {
 	}
 	// utils.Trace(utils.Cyan, "Leaving ServerRequest, everything looks good so far\n")
 	return b, nil
+}
+
+// purely temporary
+func Slogger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("test", "12345")
+		c.Next()
+		status := c.Writer.Status()
+		fmt.Println("Middleware says", status)
+	}
 }
