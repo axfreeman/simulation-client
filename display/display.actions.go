@@ -150,7 +150,7 @@ func CreateSimulation(ctx *gin.Context) {
 		return
 	}
 
-	utils.Trace(utils.Red, fmt.Sprintf("Server responded to clone request with:\n%s", string(body)))
+	utils.Trace(utils.Red, fmt.Sprintf("Server responded to clone request with:\n%s\n", string(body)))
 
 	// read the simulation id
 	var result CloneResult

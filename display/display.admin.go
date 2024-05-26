@@ -15,12 +15,6 @@ import (
 
 // Display the admin dashboard
 func AdminDashboard(ctx *gin.Context) {
-	username, err := SynchWithServer(ctx)
-	if err != nil {
-		utils.DisplayError(ctx, fmt.Sprintf(" Could not retrieve user Data for user %s \n", username))
-		return
-	}
-
 	ctx.HTML(http.StatusOK, "admin-dashboard.html", gin.H{
 		"Title": "Admin Dashboard",
 		"users": models.AdminUserList,

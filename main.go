@@ -1,7 +1,6 @@
 package main
 
 import (
-	"capfront/api"
 	"capfront/display"
 	"capfront/fetch"
 	"fmt"
@@ -11,7 +10,7 @@ import (
 
 func main() {
 
-	display.Router.Use(api.Authorize())
+	display.Router.Use(display.NewSynchWithServer())
 	display.Router.Use(gin.Recovery())
 
 	display.Router.LoadHTMLGlob("./templates/**/*") // load the templates

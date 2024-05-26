@@ -19,3 +19,5 @@
 * https://stackoverflow.com/questions/43799703/how-to-do-http-error-handling-in-go-language
 * https://nicolasmerouze.notion.site/Build-Your-Own-Web-Framework-In-Go-aeb292aa728149fa95ade6362f75f571
 * https://masteringbackend.com/posts/gin-framework
+* https://dev.to/jacobsngoodwin/16-create-gin-middleware-to-extract-authorized-user-1jom
+* 
