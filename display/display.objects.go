@@ -30,14 +30,15 @@ var Router *gin.Engine = gin.New()
 //
 //			Set 'LastVisitedPage' so we can return here after an action.
 //
-//			If successful, pass on the username using ctx.Set()
+//			If successful, pass on the user object and username using ctx.Set()
 //
-//	   Returns a brief description and an error message if unsuccessful.
 
-func NewSynchWithServer() gin.HandlerFunc {
+func SynchWithServer() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		// Check whether the server is responding at all.
+		// Use backdoor endpoint by sending admin key
+		// TODO this should be secret.
 		body, err := api.ServerRequest(models.Users["admin"].ApiKey, `admin/user/admin`)
 		if (err != nil) || (body == nil) {
 			errmsg := fmt.Sprintf("Sorry, the server is not functioning :%v\n", err)
@@ -69,15 +70,6 @@ func NewSynchWithServer() gin.HandlerFunc {
 			return
 		}
 
-		// find out what the server knows
-		//TODO this ought to be impossible, so maybe this test is overkill
-		body, err = api.ServerRequest(user.ApiKey, `admin/user/`+username)
-		if err != nil {
-			utils.Trace(utils.BrightMagenta, fmt.Sprintf("The server was not functioning :%v\n", err))
-			utils.DisplayError(ctx, "The API server is not functioning")
-			ctx.Abort()
-			return
-		}
 		synched_user := new(models.User)          // Isolated user record, not added to the list of users.
 		err = json.Unmarshal(body, &synched_user) // it's only there as a receptacle for the server data.
 		if err != nil {
@@ -89,21 +81,20 @@ func NewSynchWithServer() gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
-
 		userDetails, _ := json.MarshalIndent(synched_user, " ", " ")
 		utils.Trace(utils.BrightMagenta, fmt.Sprintf("The server sent this user record: %s\n", string(userDetails)))
 
 		utils.Trace(utils.BrightMagenta, fmt.Sprintf(
 			"The server sent a user record which says the current simulation is %d; the client says it is %d\n",
 			synched_user.CurrentSimulationID,
-			models.Users[username].CurrentSimulationID,
+			user.CurrentSimulationID,
 		))
 
 		// Update client data from the server if need be.
-		if models.Users[username].CurrentSimulationID != synched_user.CurrentSimulationID {
+		if user.CurrentSimulationID != synched_user.CurrentSimulationID {
 			utils.Trace(utils.Yellow, fmt.Sprintf("We are out of synch. Server thinks our simulation is %d and client says it is %d\n",
 				synched_user.CurrentSimulationID,
-				models.Users[username].CurrentSimulationID))
+				user.CurrentSimulationID))
 
 			// Resynchronise
 			if !fetch.FetchUserObjects(ctx, username) {
@@ -115,7 +106,8 @@ func NewSynchWithServer() gin.HandlerFunc {
 			}
 		}
 
-		models.Users[username].LastVisitedPage = ctx.Request.URL.Path
+		user.LastVisitedPage = ctx.Request.URL.Path
+		ctx.Set("userobject", user)
 		ctx.Set("user", username)
 		utils.Trace(utils.BrightMagenta, fmt.Sprintf("User %s is good to go\n", username))
 	}

@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	display.Router.Use(display.NewSynchWithServer())
+	display.Router.Use(display.SynchWithServer())
 	display.Router.Use(gin.Recovery())
 
 	display.Router.LoadHTMLGlob("./templates/**/*") // load the templates
