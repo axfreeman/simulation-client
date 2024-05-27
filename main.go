@@ -45,6 +45,7 @@ func main() {
 	display.Router.GET("/user/dashboard", display.SynchWithServer(), display.UserDashboard)
 	display.Router.GET("/back", display.SynchWithServer(), display.Back)
 	display.Router.GET("/forward", display.SynchWithServer(), display.Forward)
+	display.Router.GET("/quit", display.SynchWithServer(), display.Quit)
 
 	// Grab user data from the server at startup. Currently, this is fixed.
 	// BUT note that if users are modified on the server, we will be out of synch.

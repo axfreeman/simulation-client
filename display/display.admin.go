@@ -62,3 +62,26 @@ func Lock(ctx *gin.Context) {
 		"users": models.AdminUserList,
 	})
 }
+
+// Quit playing as the current user.
+//
+//	Locally, set 'IsLoggedIn'
+//	Tell the server
+//	If the user cannot be found just return (error will already have been signalled)
+//	If the server complains, display an error.
+func Quit(ctx *gin.Context) {
+	utils.Trace(utils.Purple, "Quit was requested\n")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
+	user := userobject.(*models.User)
+	user.IsLocked = true
+	_, err := api.ServerRequest(user.ApiKey, `admin/unlock/`+user.UserName)
+	if err != nil {
+		utils.DisplayError(ctx, fmt.Sprintf("User %s could quit because the server objected.", user.UserName))
+		ctx.Abort()
+		return
+	}
+
+}

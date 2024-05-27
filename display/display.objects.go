@@ -300,7 +300,7 @@ func ShowIndexPage(ctx *gin.Context) {
 	}
 
 	userobject, ok := ctx.Get("userobject")
-	utils.Trace(utils.Yellow, fmt.Sprintf(" The user object was %v and ok was %v \n", userobject, ok))
+	utils.Trace(utils.Yellow, fmt.Sprintf(" The middleware provided user object %v with status %v \n", userobject, ok))
 	if !ok {
 		return
 	}
@@ -309,7 +309,9 @@ func ShowIndexPage(ctx *gin.Context) {
 
 	// if user has no simulations, redirect to the user dashboard
 	if u.CurrentSimulationID == 0 {
-		ctx.Redirect(http.StatusMovedPermanently, "/user/dashboard")
+		ctx.Request.URL.Path = `/user/dashboard`
+		Router.HandleContext(ctx)
+		// ctx.Redirect(http.StatusMovedPermanently, "/user/dashboard") - causes error 'Warning headers were already written'
 		ctx.Abort()
 	}
 
