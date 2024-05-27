@@ -304,10 +304,15 @@ func ShowIndexPage(ctx *gin.Context) {
 	if !ok {
 		return
 	}
-
 	u := userobject.(*models.User)
-
 	utils.Trace(utils.BrightMagenta, fmt.Sprintf("Got a user from the middleware. It was %s\n", u.UserName))
+
+	// if user has no simulations, redirect to the user dashboard
+	if u.CurrentSimulationID == 0 {
+		ctx.Redirect(http.StatusMovedPermanently, "/user/dashboard")
+		ctx.Abort()
+	}
+
 	state := u.Get_current_state()
 	clist := u.Commodities()
 	ilist := u.Industries()

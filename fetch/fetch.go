@@ -57,5 +57,4 @@ func Initialise() {
 		user := models.NewUser(item.UserName, item.CurrentSimulationID, item.ApiKey)
 		models.Users[item.UserName] = &user
 	}
-
 }
