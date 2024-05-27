@@ -37,7 +37,7 @@ func DivertToLogin(ctx *gin.Context, message string) {
 	utils.Trace(utils.BrightMagenta, message)
 	ctx.Request.URL.Path = "/admin/choose-players"
 	Router.HandleContext(ctx)
-	// ctx.Abort()
+	ctx.Abort()
 }
 
 func DisplayErrorScreen(ctx *gin.Context, message string) {
@@ -290,8 +290,7 @@ func ShowClass(ctx *gin.Context) {
 	}
 }
 
-// Displays snapshot of the economy
-
+// Displays a snapshot of the economy
 func ShowIndexPage(ctx *gin.Context) {
 	// Uncomment for more detailed diagnostics
 	_, file, no, ok := runtime.Caller(1)
@@ -311,7 +310,6 @@ func ShowIndexPage(ctx *gin.Context) {
 	if u.CurrentSimulationID == 0 {
 		ctx.Request.URL.Path = `/user/dashboard`
 		Router.HandleContext(ctx)
-		// ctx.Redirect(http.StatusMovedPermanently, "/user/dashboard") - causes error 'Warning headers were already written'
 		ctx.Abort()
 	}
 
@@ -380,6 +378,7 @@ func UserDashboard(ctx *gin.Context) {
 		"Title":       "Dashboard",
 		"simulations": slist,
 		"templates":   models.TemplateList,
+		"count":       len(slist),
 		"username":    user.UserName,
 		"state":       state,
 	})

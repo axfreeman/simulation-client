@@ -51,7 +51,7 @@ func SelectUser(ctx *gin.Context) {
 	}
 	models.Users[u].IsLocked = true
 	http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: u, Path: "/"})
-	// TODO a more sensible redirect.
+	// TODO a more sensible redirect?
 	ctx.Request.URL.Path = `/`
 	Router.HandleContext(ctx)
 }
@@ -76,12 +76,16 @@ func Quit(ctx *gin.Context) {
 		return
 	}
 	user := userobject.(*models.User)
-	user.IsLocked = true
+	user.IsLocked = false
 	_, err := api.ServerRequest(user.ApiKey, `admin/unlock/`+user.UserName)
 	if err != nil {
-		utils.DisplayError(ctx, fmt.Sprintf("User %s could quit because the server objected.", user.UserName))
+		utils.DisplayError(ctx, fmt.Sprintf("User %s could not quit because the server objected.", user.UserName))
 		ctx.Abort()
 		return
 	}
 
+	utils.Trace(utils.Purple, fmt.Sprintf(" %s has quit\n", user.UserName))
+	// TODO a more sensible redirect?
+	ctx.Request.URL.Path = `/`
+	Router.HandleContext(ctx)
 }
