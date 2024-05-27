@@ -68,7 +68,10 @@ func ActionHandler(ctx *gin.Context) {
 
 	// It is syntactically well-formed. Send it to the server.
 	act := ctx.Param("action")
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 	username := user.UserName
 	utils.Trace(utils.Yellow, fmt.Sprintf("User %s wants to perform action %s. Last visited page was %s\n", username, act, user.LastVisitedPage))
@@ -136,7 +139,10 @@ func CreateSimulation(ctx *gin.Context) {
 		utils.Trace(utils.Green, fmt.Sprintf(" Clone Simulation was called from %s#%d\n", file, no))
 	}
 
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 	username := user.UserName
 	t := ctx.Param("id")
@@ -187,7 +193,10 @@ func CreateSimulation(ctx *gin.Context) {
 // Do nothing if we are already at the earliest stage
 func Back(ctx *gin.Context) {
 	utils.Trace(utils.Purple, "Back was requested\n")
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 
 	if user.ViewedTimeStamp > 0 {
@@ -213,7 +222,10 @@ func Back(ctx *gin.Context) {
 // Ensure the comparator stamp is one step behind the view stamp
 func Forward(ctx *gin.Context) {
 	utils.Trace(utils.Purple, "Forward was requested\n")
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 	if user.ViewedTimeStamp < user.TimeStamp {
 		user.ViewedTimeStamp++

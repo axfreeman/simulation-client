@@ -33,27 +33,36 @@ var Router *gin.Engine = gin.New()
 //			If successful, pass on the user object and username using ctx.Set()
 //
 
+func DivertToLogin(ctx *gin.Context, message string) {
+	utils.Trace(utils.BrightMagenta, message)
+	ctx.Request.URL.Path = "/admin/choose-players"
+	Router.HandleContext(ctx)
+	// ctx.Abort()
+}
+
+func DisplayErrorScreen(ctx *gin.Context, message string) {
+	utils.Trace(utils.Red, message)
+	ctx.HTML(http.StatusBadRequest, "errors.html", gin.H{
+		"message": message,
+	})
+	ctx.Abort()
+}
+
 func SynchWithServer() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		// Check whether the server is responding at all.
 		// Use backdoor endpoint by sending admin key
-		// TODO this should be secret.
 		body, err := api.ServerRequest(models.Users["admin"].ApiKey, `admin/user/admin`)
 		if (err != nil) || (body == nil) {
-			errmsg := fmt.Sprintf("Sorry, the server is not functioning :%v\n", err)
-			utils.Trace(utils.Red, errmsg)
-			utils.DisplayError(ctx, errmsg)
-			ctx.Abort()
+			DisplayErrorScreen(ctx, fmt.Sprintf("Sorry, we cannot reach the server because: %v\n", err))
 			return
 		}
+
 		// find out what the browser knows
 		userCookie, err := ctx.Request.Cookie("user")
 		if err != nil {
-			utils.Trace(utils.BrightMagenta, fmt.Sprintf("Could not retrieve any user cookie becase of %v\n", err))
-			ctx.Request.URL.Path = "/admin/choose-players"
-			Router.HandleContext(ctx)
-			ctx.Abort()
+			DivertToLogin(ctx, fmt.Sprintf("We could not retrieve a user cookie because: %v\n", err))
 			return
 		}
 
@@ -63,52 +72,56 @@ func SynchWithServer() gin.HandlerFunc {
 
 		user := models.Users[username]
 		if user.ApiKey == "" {
-			utils.Trace(utils.BrightMagenta, "ERROR: User has no api key\n")
-			ctx.Request.URL.Path = "/admin/choose-players"
-			Router.HandleContext(ctx)
-			ctx.Abort()
+			DivertToLogin(ctx, "This user has no api key\n")
+			return
+		}
+
+		// Ask the server what it knows about this user
+		// Use the admin backdoor to get the information.
+		body, err = api.ServerRequest(models.Users["admin"].ApiKey, `admin/user/`+username)
+		if (err != nil) || (body == nil) {
+			DisplayErrorScreen(ctx, fmt.Sprintf("Sorry, the server is not functioning :%v\n", err))
 			return
 		}
 
 		synched_user := new(models.User)          // Isolated user record, not added to the list of users.
 		err = json.Unmarshal(body, &synched_user) // it's only there as a receptacle for the server data.
 		if err != nil {
-			utils.Trace(
-				utils.BrightMagenta,
-				fmt.Sprintf("Couldn't make sense of what the server said about user %s :%v\n", username, err))
-			ctx.Request.URL.Path = "/admin/choose-players"
-			Router.HandleContext(ctx)
-			ctx.Abort()
+			DivertToLogin(ctx, fmt.Sprintf("Couldn't make sense of what the server said about user %s :%v\n", username, err))
 			return
 		}
 		userDetails, _ := json.MarshalIndent(synched_user, " ", " ")
 		utils.Trace(utils.BrightMagenta, fmt.Sprintf("The server sent this user record: %s\n", string(userDetails)))
 
+		// Is the user locked at the server? If not, force login
+		if !synched_user.IsLocked {
+			DivertToLogin(ctx, "This user is not locked at the server\n")
+			return
+		}
+
+		// The Server and Client agree that this user can go ahead
+		user.IsLocked = true
 		utils.Trace(utils.BrightMagenta, fmt.Sprintf(
-			"The server sent a user record which says the current simulation is %d; the client says it is %d\n",
+			"The server says the current simulation is %d; client says it is %d\n",
 			synched_user.CurrentSimulationID,
 			user.CurrentSimulationID,
 		))
 
-		// Update client data from the server if need be.
+		// Check if we should update the client-side copy of the server data
 		if user.CurrentSimulationID != synched_user.CurrentSimulationID {
 			utils.Trace(utils.Yellow, fmt.Sprintf("We are out of synch. Server thinks our simulation is %d and client says it is %d\n",
 				synched_user.CurrentSimulationID,
 				user.CurrentSimulationID))
 
-			// Resynchronise
+			// Yes, we do need to update
 			if !fetch.FetchUserObjects(ctx, username) {
-				utils.Trace(utils.Red, fmt.Sprintf("ERROR: Could not retrieve data for user %s\n", username))
-				ctx.Request.URL.Path = "/admin/choose-players"
-				Router.HandleContext(ctx)
-				ctx.Abort()
+				DivertToLogin(ctx, fmt.Sprintf("ERROR: Could not retrieve data for user %s\n", username))
 				return
 			}
 		}
 
 		user.LastVisitedPage = ctx.Request.URL.Path
 		ctx.Set("userobject", user)
-		ctx.Set("user", username)
 		utils.Trace(utils.BrightMagenta, fmt.Sprintf("User %s is good to go\n", username))
 	}
 }
@@ -149,7 +162,10 @@ func set_current_state(username string, new_state string) {
 
 // display all commodities in the current simulation
 func ShowCommodities(ctx *gin.Context) {
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 	state := user.Get_current_state()
 	commodityViews := user.CommodityViews()
@@ -165,7 +181,10 @@ func ShowCommodities(ctx *gin.Context) {
 
 // display all industries in the current simulation
 func ShowIndustries(ctx *gin.Context) {
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 	state := user.Get_current_state()
 	industryViews := user.IndustryViews()
@@ -181,7 +200,10 @@ func ShowIndustries(ctx *gin.Context) {
 
 // display all classes in the current simulation
 func ShowClasses(ctx *gin.Context) {
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 	state := user.Get_current_state()
 	classViews := user.ClassViews()
@@ -200,7 +222,10 @@ func ShowClasses(ctx *gin.Context) {
 
 // Display one specific commodity
 func ShowCommodity(ctx *gin.Context) {
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 
 	state := user.Get_current_state()
@@ -221,7 +246,10 @@ func ShowCommodity(ctx *gin.Context) {
 
 // Display one specific industry
 func ShowIndustry(ctx *gin.Context) {
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 	state := user.Get_current_state()
 	id, _ := strconv.Atoi(ctx.Param("id"))
@@ -240,7 +268,10 @@ func ShowIndustry(ctx *gin.Context) {
 
 // Display one specific class
 func ShowClass(ctx *gin.Context) {
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 
 	state := user.Get_current_state()
@@ -268,7 +299,12 @@ func ShowIndexPage(ctx *gin.Context) {
 		utils.Trace(utils.Yellow, fmt.Sprintf(" ShowIndexPage was called from %s#%d\n", file, no))
 	}
 
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	utils.Trace(utils.Yellow, fmt.Sprintf(" The user object was %v and ok was %v \n", userobject, ok))
+	if !ok {
+		return
+	}
+
 	u := userobject.(*models.User)
 
 	utils.Trace(utils.BrightMagenta, fmt.Sprintf("Got a user from the middleware. It was %s\n", u.UserName))
@@ -298,7 +334,10 @@ func ShowIndexPage(ctx *gin.Context) {
 
 // Fetch the trace from the local database
 func ShowTrace(ctx *gin.Context) {
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 	state := user.Get_current_state()
 	tlist := *user.Traces(user.ViewedTimeStamp)
@@ -322,7 +361,10 @@ func UserDashboard(ctx *gin.Context) {
 		utils.Trace(utils.Yellow, fmt.Sprintf(" User Dashboard was called from %s line #%d\n", file, no))
 	}
 
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 	state := user.Get_current_state()
 	slist := *user.Simulations()
@@ -343,7 +385,10 @@ func DataHandler(ctx *gin.Context) {
 
 // TODO not working yet
 func SwitchSimulation(ctx *gin.Context) {
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	log.Output(1, fmt.Sprintf("User %s wants to switch to simulation %d", user.UserName, id))
@@ -362,7 +407,10 @@ func RestartSimulation(ctx *gin.Context) {
 
 // display all industry stocks in the current simulation
 func ShowIndustryStocks(ctx *gin.Context) {
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
@@ -381,7 +429,10 @@ func ShowIndustryStocks(ctx *gin.Context) {
 
 // display all the class stocks in the current simulation
 func ShowClassStocks(ctx *gin.Context) {
-	userobject, _ := ctx.Get("userobject")
+	userobject, ok := ctx.Get("userobject")
+	if !ok {
+		return
+	}
 	user := userobject.(*models.User)
 
 	id, _ := strconv.Atoi(ctx.Param("id"))

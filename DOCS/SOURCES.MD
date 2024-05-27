@@ -20,4 +20,5 @@
 * https://nicolasmerouze.notion.site/Build-Your-Own-Web-Framework-In-Go-aeb292aa728149fa95ade6362f75f571
 * https://masteringbackend.com/posts/gin-framework
 * https://dev.to/jacobsngoodwin/16-create-gin-middleware-to-extract-authorized-user-1jom
+* https://www.squash.io/exploring-advanced-features-of-gin-in-golang/
 * 
