@@ -21,4 +21,6 @@
 * https://masteringbackend.com/posts/gin-framework
 * https://dev.to/jacobsngoodwin/16-create-gin-middleware-to-extract-authorized-user-1jom
 * https://www.squash.io/exploring-advanced-features-of-gin-in-golang/
-* 
+
+## Cookies
+* https://chenhuijing.com/blog/understanding-browser-cookies/

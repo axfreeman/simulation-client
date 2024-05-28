@@ -39,27 +39,40 @@ func AdminReset(ctx *gin.Context) {
 //
 //	If the lock succeeds, set a cookie and register the lock on the User object.
 func SelectUser(ctx *gin.Context) {
-	u := ctx.Param("username")
+	// pick up the cookie information that was set by SynchWithServer middleware
+	username := ctx.Params.ByName("username")
+	if username == "" {
+		utils.Trace(utils.Red, " ERROR: The router did not pick up a valid player name")
+	}
+	user := models.Users[username]
 
-	utils.Trace(utils.Yellow, fmt.Sprintf("user %s will play\n", u))
-	// lock this user
-	_, err := api.ServerRequest(models.Users[u].ApiKey, `admin/lock/`+u)
+	// lock this user at the server.
+	// It's just possible someone else gets in first, so abort if this doesn't work.
+	_, err := api.ServerRequest(user.ApiKey, `admin/lock/`+username)
 	if err != nil {
-		utils.DisplayError(ctx, fmt.Sprintf("Could not play as user %s. It's just possible somebody else got in first", u))
+		utils.DisplayError(ctx, fmt.Sprintf("Could not play as %s. Maybe somebody else got in first. Try again and tell me if the error persists", username))
 		ctx.Abort()
 		return
 	}
-	models.Users[u].IsLocked = true
-	http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: u, Path: "/"})
-	// TODO a more sensible redirect?
-	ctx.Request.URL.Path = `/`
-	Router.HandleContext(ctx)
+
+	// lock this user at the client
+	user.IsLocked = true
+
+	// Set cookie with no MaxAge and no Expiry
+	// NOTE it is claimed this will be deleted when browser closes, but it isn't.
+	// see, eg https://stackoverflow.com/questions/10617954/chrome-doesnt-delete-session-cookies/10772420#10772420
+	utils.Trace(utils.Yellow, fmt.Sprintf("user %s will play\n", username))
+	http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: username, Path: "/"})
+	ctx.Redirect(http.StatusPermanentRedirect, `/`)
+	// ctx.Request.URL.Path = `/`
+	// Router.HandleContext(ctx)
 }
 
 func Lock(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "choose-player.html", gin.H{
-		"Title": "Choose player",
-		"users": models.AdminUserList,
+		"Title":      "Choose player",
+		"adminusers": models.AdminUserList,
+		"users":      models.Users,
 	})
 }
 
@@ -84,8 +97,9 @@ func Quit(ctx *gin.Context) {
 		return
 	}
 
-	utils.Trace(utils.Purple, fmt.Sprintf(" %s has quit\n", user.UserName))
-	// TODO a more sensible redirect?
+	// Delete any cookie stil hanging around
+	http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: user.UserName, Path: "/", MaxAge: 0})
+	utils.Trace(utils.BrightMagenta, fmt.Sprintf("%s has quit\n", user.UserName))
 	ctx.Request.URL.Path = `/`
 	Router.HandleContext(ctx)
 }

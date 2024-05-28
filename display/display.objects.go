@@ -90,12 +90,14 @@ func SynchWithServer() gin.HandlerFunc {
 			DivertToLogin(ctx, fmt.Sprintf("Couldn't make sense of what the server said about user %s :%v\n", username, err))
 			return
 		}
-		userDetails, _ := json.MarshalIndent(synched_user, " ", " ")
-		utils.Trace(utils.BrightMagenta, fmt.Sprintf("The server sent this user record: %s\n", string(userDetails)))
+
+		// uncomment for verbose diagnostics
+		// userDetails, _ := json.MarshalIndent(synched_user, " ", " ")
+		// utils.Trace(utils.BrightMagenta, fmt.Sprintf("The server sent this user record: %s\n", string(userDetails)))
 
 		// Is the user locked at the server? If not, force login
 		if !synched_user.IsLocked {
-			DivertToLogin(ctx, "This user is not locked at the server\n")
+			DivertToLogin(ctx, fmt.Sprintf(" User %s is not locked at the server and cannot play\n", synched_user.UserName))
 			return
 		}
 
@@ -295,14 +297,19 @@ func ShowIndexPage(ctx *gin.Context) {
 	// Uncomment for more detailed diagnostics
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
-		utils.Trace(utils.Yellow, fmt.Sprintf(" ShowIndexPage was called from %s#%d\n", file, no))
+		utils.Trace(utils.Yellow, fmt.Sprintf("ShowIndexPage was called from %s#%d\n", file, no))
 	}
 
 	userobject, ok := ctx.Get("userobject")
-	utils.Trace(utils.Yellow, fmt.Sprintf(" The middleware provided user object %v with status %v \n", userobject, ok))
 	if !ok {
+		utils.Trace(utils.Red, "The middleware failed to provide a user object")
 		return
 	}
+
+	// uncomment for more detail
+	// utils.Trace(utils.Yellow, "The middleware provided the following user object\n")
+	// utils.Trace(utils.BrightWhite, fmt.Sprintf("%v", userobject))
+
 	u := userobject.(*models.User)
 	utils.Trace(utils.BrightMagenta, fmt.Sprintf("Got a user from the middleware. It was %s\n", u.UserName))
 
@@ -363,7 +370,7 @@ func ShowTrace(ctx *gin.Context) {
 // in the user dashboard.
 func UserDashboard(ctx *gin.Context) {
 	if _, file, no, ok := runtime.Caller(1); ok {
-		utils.Trace(utils.Yellow, fmt.Sprintf(" User Dashboard was called from %s line #%d\n", file, no))
+		utils.Trace(utils.Yellow, fmt.Sprintf("User Dashboard was called from %s line #%d\n", file, no))
 	}
 
 	userobject, ok := ctx.Get("userobject")

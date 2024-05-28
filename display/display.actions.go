@@ -54,7 +54,7 @@ func ActionHandler(ctx *gin.Context) {
 	// Comment for less detailed diagnostics
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
-		utils.Trace(utils.Purple, fmt.Sprintf(" ActionHandler was called from %s #%d\n", file, no))
+		utils.Trace(utils.Yellow, fmt.Sprintf("ActionHandler was called from %s #%d\n", file, no))
 	}
 	var param string
 
@@ -136,7 +136,7 @@ func CreateSimulation(ctx *gin.Context) {
 	// Comment for shorter diagnostics
 	_, file, no, ok := runtime.Caller(1)
 	if ok {
-		utils.Trace(utils.Green, fmt.Sprintf(" Clone Simulation was called from %s#%d\n", file, no))
+		utils.Trace(utils.Green, fmt.Sprintf("Clone Simulation was called from %s#%d\n", file, no))
 	}
 
 	userobject, ok := ctx.Get("userobject")
@@ -156,7 +156,8 @@ func CreateSimulation(ctx *gin.Context) {
 		return
 	}
 
-	utils.Trace(utils.Red, fmt.Sprintf("Server responded to clone request with:\n%s\n", string(body)))
+	utils.Trace(utils.Green, ("Server responded to clone request with the following message:\n"))
+	utils.Trace(utils.BrightWhite, ` `+string(body))
 
 	// read the simulation id
 	var result CloneResult
