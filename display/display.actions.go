@@ -86,7 +86,6 @@ func ActionHandler(ctx *gin.Context) {
 	// Advance both the TimeStamp AND the ViewedTimeStamp and create a new
 	// Dataset.This (ought to) place the next fetched dataset in the new
 	// record, preserving the previous record.
-
 	// Create a new dataset
 	new_dataset := models.NewDataset(user.ApiKey)
 
