@@ -97,7 +97,7 @@ func SynchWithServer() gin.HandlerFunc {
 
 		// Is the user locked at the server? If not, force login
 		if !synched_user.IsLocked {
-			DivertToLogin(ctx, fmt.Sprintf(" User %s is not locked at the server and cannot play\n", synched_user.UserName))
+			DivertToLogin(ctx, fmt.Sprintf("%s is not locked at the server and cannot play\n", synched_user.UserName))
 			return
 		}
 
