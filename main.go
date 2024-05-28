@@ -56,5 +56,5 @@ func main() {
 	// Uncomment in extremis for very verbose diagnostic. As a first resort use the /Data endpoint when simulation is running.
 	// display.ListData()
 
-	display.Router.Run("localhost:8080") // Run the server
+	display.Router.Run() // Run the server
 }
