@@ -61,9 +61,9 @@ func SelectUser(ctx *gin.Context) {
 	// Set cookie with no MaxAge and no Expiry
 	// NOTE it is claimed this will be deleted when browser closes, but it isn't.
 	// see, eg https://stackoverflow.com/questions/10617954/chrome-doesnt-delete-session-cookies/10772420#10772420
-	utils.Trace(utils.Yellow, fmt.Sprintf("user %s will play\n", username))
+	utils.Trace(utils.Gray, fmt.Sprintf("user %s will play\n", username))
 	http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: username, Path: "/"})
-	ctx.Redirect(http.StatusPermanentRedirect, `/`)
+	ctx.Redirect(http.StatusPermanentRedirect, `/user/dashboard`)
 	// ctx.Request.URL.Path = `/`
 	// Router.HandleContext(ctx)
 }
@@ -83,14 +83,14 @@ func Lock(ctx *gin.Context) {
 //	If the user cannot be found just return (error will already have been signalled)
 //	If the server complains, display an error.
 func Quit(ctx *gin.Context) {
-	utils.Trace(utils.Purple, "Quit was requested\n")
+	utils.Trace(utils.Gray, "Quit was requested\n")
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
 		return
 	}
 	user := userobject.(*models.User)
 	user.IsLocked = false
-	_, err := api.ServerRequest(user.ApiKey, `admin/unlock/`+user.UserName)
+	_, err := api.ServerRequest(user.ApiKey, `admin/unlock/`+user.UserName) //TODO server should delete this user's simulations
 	if err != nil {
 		utils.DisplayError(ctx, fmt.Sprintf("User %s could not quit because the server objected.", user.UserName))
 		ctx.Abort()
@@ -99,7 +99,7 @@ func Quit(ctx *gin.Context) {
 
 	// Delete any cookie stil hanging around
 	http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: user.UserName, Path: "/", MaxAge: 0})
-	utils.Trace(utils.BrightMagenta, fmt.Sprintf("%s has quit\n", user.UserName))
+	utils.Trace(utils.Gray, fmt.Sprintf("%s has quit\n", user.UserName))
 	ctx.Request.URL.Path = `/`
 	Router.HandleContext(ctx)
 }

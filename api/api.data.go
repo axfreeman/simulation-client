@@ -89,6 +89,6 @@ func FetchGlobalObject(url string, target any) bool {
 		log.Output(1, fmt.Sprint("Could not unmarshal the server response:\n", string(body_as_string)))
 		return false
 	}
-	utils.Trace(utils.Blue, fmt.Sprintf("Request for data from endpoint %s accepted\n", url))
+	utils.Trace(utils.BrightWhite, fmt.Sprintf("Request for data from endpoint %s accepted\n", url))
 	return true
 }

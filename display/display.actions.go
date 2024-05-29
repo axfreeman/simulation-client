@@ -156,7 +156,7 @@ func CreateSimulation(ctx *gin.Context) {
 	}
 
 	utils.Trace(utils.Green, ("Server responded to clone request with the following message:\n"))
-	utils.Trace(utils.BrightWhite, ` `+string(body))
+	utils.Trace(utils.Green, ` `+string(body))
 
 	// read the simulation id
 	var result CloneResult
@@ -192,7 +192,7 @@ func CreateSimulation(ctx *gin.Context) {
 // Display the previous state of the simulation
 // Do nothing if we are already at the earliest stage
 func Back(ctx *gin.Context) {
-	utils.Trace(utils.Purple, "Back was requested\n")
+	utils.Trace(utils.White, "Back was requested\n")
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
 		return
@@ -206,7 +206,7 @@ func Back(ctx *gin.Context) {
 		user.ComparatorTimeStamp--
 	}
 
-	utils.Trace(utils.Purple, fmt.Sprintf("Viewing %d with comparator %d\n", user.ViewedTimeStamp, user.ComparatorTimeStamp))
+	utils.Trace(utils.White, fmt.Sprintf("Viewing %d with comparator %d\n", user.ViewedTimeStamp, user.ComparatorTimeStamp))
 	lastVisitedPage := user.LastVisitedPage
 
 	if useLastVisited(lastVisitedPage) {
@@ -221,7 +221,7 @@ func Back(ctx *gin.Context) {
 // Do nothing if we are already viewing the most recent state
 // Ensure the comparator stamp is one step behind the view stamp
 func Forward(ctx *gin.Context) {
-	utils.Trace(utils.Purple, "Forward was requested\n")
+	utils.Trace(utils.White, "Forward was requested\n")
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
 		return
@@ -234,7 +234,7 @@ func Forward(ctx *gin.Context) {
 		user.ComparatorTimeStamp++
 	}
 
-	utils.Trace(utils.Purple, fmt.Sprintf("Viewing %d with comparator %d\n", user.ViewedTimeStamp, user.ComparatorTimeStamp))
+	utils.Trace(utils.White, fmt.Sprintf("Viewing %d with comparator %d\n", user.ViewedTimeStamp, user.ComparatorTimeStamp))
 	lastVisitedPage := user.LastVisitedPage
 
 	if useLastVisited(lastVisitedPage) {

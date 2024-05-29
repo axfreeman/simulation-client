@@ -34,7 +34,7 @@ var Router *gin.Engine = gin.New()
 //
 
 func DivertToLogin(ctx *gin.Context, message string) {
-	utils.Trace(utils.BrightMagenta, message)
+	utils.Trace(utils.Purple, message)
 	ctx.Request.URL.Path = "/admin/choose-players"
 	Router.HandleContext(ctx)
 	ctx.Abort()
@@ -111,7 +111,7 @@ func SynchWithServer() gin.HandlerFunc {
 
 		// Check if we should update the client-side copy of the server data
 		if user.CurrentSimulationID != synched_user.CurrentSimulationID {
-			utils.Trace(utils.Yellow, fmt.Sprintf("We are out of synch. Server thinks our simulation is %d and client says it is %d\n",
+			utils.Trace(utils.BrightMagenta, fmt.Sprintf("We are out of synch. Server thinks our simulation is %d and client says it is %d\n",
 				synched_user.CurrentSimulationID,
 				user.CurrentSimulationID))
 
@@ -311,7 +311,7 @@ func ShowIndexPage(ctx *gin.Context) {
 	// utils.Trace(utils.BrightWhite, fmt.Sprintf("%v", userobject))
 
 	u := userobject.(*models.User)
-	utils.Trace(utils.BrightMagenta, fmt.Sprintf("Got a user from the middleware. It was %s\n", u.UserName))
+	utils.Trace(utils.Yellow, fmt.Sprintf("Got a user from the middleware. It was %s\n", u.UserName))
 
 	// if user has no simulations, redirect to the user dashboard
 	if u.CurrentSimulationID == 0 {
@@ -329,7 +329,7 @@ func ShowIndexPage(ctx *gin.Context) {
 	classViews := u.ClassViews()
 
 	// industryViewAsString, _ := json.MarshalIndent(industryViews, " ", " ")
-	// utils.Trace(utils.BrightCyan, "  Industry view before displaying index page is\n"+string(industryViewAsString)+"/n")
+	// utils.Trace(utils.Yellow, "  Industry view before displaying index page is\n"+string(industryViewAsString)+"/n")
 
 	ctx.HTML(http.StatusOK, "index.html", gin.H{
 		"Title":          "Economy",

@@ -35,7 +35,7 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 			log.Output(1, fmt.Sprintf("Could not retrieve server data for the new dataset with key %s\n", key))
 		}
 	}
-	utils.Trace(utils.Cyan, "Refresh complete\n")
+	utils.Trace(utils.White, "Refresh complete\n")
 	return true
 }
 
