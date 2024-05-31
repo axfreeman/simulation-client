@@ -39,12 +39,17 @@ func AdminReset(ctx *gin.Context) {
 //
 //	If the lock succeeds, set a cookie and register the lock on the User object.
 func SelectUser(ctx *gin.Context) {
-	// pick up the cookie information that was set by SynchWithServer middleware
+	// pick up the chosen user
 	username := ctx.Params.ByName("username")
 	if username == "" {
-		utils.Trace(utils.Red, " ERROR: The router did not pick up a valid player name")
+		utils.Trace(utils.Red, "The router did not pick up a valid player name")
+		return
 	}
-	user := models.Users[username]
+	user, ok := models.Users[username]
+	if !ok {
+		utils.Trace(utils.Red, "The router did not pick up a valid player name")
+		return
+	}
 
 	// lock this user at the server.
 	// It's just possible someone else gets in first, so abort if this doesn't work.
@@ -61,12 +66,11 @@ func SelectUser(ctx *gin.Context) {
 	// Set cookie with no MaxAge and no Expiry
 	// NOTE it is claimed this will be deleted when browser closes, but it isn't.
 	// see, eg https://stackoverflow.com/questions/10617954/chrome-doesnt-delete-session-cookies/10772420#10772420
-	utils.Trace(utils.Gray, fmt.Sprintf("user %s will play\n", username))
+	utils.Trace(utils.Gray, fmt.Sprintf("User %s will play\n", username))
 	http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: username, Path: "/"})
-	ctx.Request.URL.Path = `/`
+	ctx.Request.URL.Path = `/user/dashboard`
 	Router.HandleContext(ctx)
 	ctx.Abort()
-
 }
 
 // func DisplayPlayerChoice(ctx *gin.Context) {
@@ -75,32 +79,48 @@ func SelectUser(ctx *gin.Context) {
 // 		"adminusers": models.AdminUserList,
 // 		"users":      models.Users,
 // 	})
+// 	ctx.Abort()
 // }
 
-// Quit playing as the current user.
+// Quit playing as the current user and start playing as another
+// Doesn't mean leave the game.
 //
-//	Locally, set 'IsLoggedIn'
-//	Tell the server
-//	If the user cannot be found just return (error will already have been signalled)
-//	If the server complains, display an error.
+//	 ... you can quit but you can never leave...
+//
+//		 Locally, set 'IsLoggedIn'
+//		 Tell the server
+//		 If the user cannot be found just return (error will already have been signalled)
+//		 If the server complains, display an error.
 func Quit(ctx *gin.Context) {
 	utils.Trace(utils.Gray, "Quit was requested\n")
 	userobject, ok := ctx.Get("userobject")
+	utils.Trace(utils.Gray, fmt.Sprintf("Asked for a user object and OK status was %v\n", ok))
+	utils.Trace(utils.Gray, fmt.Sprintf("The user object was %v\n", userobject))
 	if !ok {
 		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
-	user.IsLocked = false
-	_, err := api.ServerRequest(user.ApiKey, `admin/unlock/`+user.UserName) //TODO server should delete this user's simulations
-	if err != nil {
-		utils.DisplayError(ctx, fmt.Sprintf("User %s could not quit because the server objected.", user.UserName))
-		ctx.Abort()
-		return
+	utils.Trace(utils.Gray, fmt.Sprintf("The user name was %v\n", user.UserName))
+
+	// Guest can never quit.
+	if user.UserName != `guest` {
+		// All others have to unlock.
+		user.IsLocked = false
+		_, err := api.ServerRequest(user.ApiKey, `admin/unlock/`+user.UserName) //TODO server should delete this user's simulations
+		if err != nil {
+			utils.DisplayError(ctx, fmt.Sprintf("User %s could not quit because the server objected.", user.UserName))
+			ctx.Abort()
+			return
+		}
+
+		http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: user.UserName, Path: "/", MaxAge: 0})
+		utils.Trace(utils.Gray, fmt.Sprintf("%s has quit\n", user.UserName))
 	}
 
-	// Delete any cookie stil hanging around
-	http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: user.UserName, Path: "/", MaxAge: 0})
-	utils.Trace(utils.Gray, fmt.Sprintf("%s has quit\n", user.UserName))
-	ctx.Request.URL.Path = `/`
-	Router.HandleContext(ctx)
+	ctx.HTML(http.StatusOK, "choose-player.html", gin.H{
+		"Title": "Choose player",
+		"users": models.Users,
+	})
+	ctx.Abort()
+	// log.Fatal("Diagnostic halt")
 }

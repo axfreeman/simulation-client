@@ -23,10 +23,9 @@ func main() {
 	display.Router.GET("/admin/dashboard", display.AdminDashboard)
 	display.Router.GET("/data/", display.DataHandler)
 
-	// The endpoints below require authorization
-	// TODO couldn't get grouping to work. Pretty sure it did not work as per spec
+	// Everything below is specific to a user and protected
 
-	// Routes that display tables
+	// Routes that fetch and display tables
 	display.Router.GET("/commodities", display.FindPlayer(), display.ShowCommodities)
 	display.Router.GET("/industries", display.FindPlayer(), display.ShowIndustries)
 	display.Router.GET("/classes", display.FindPlayer(), display.ShowClasses)
@@ -38,12 +37,12 @@ func main() {
 	display.Router.GET("/class/:id", display.FindPlayer(), display.ShowClass)
 	display.Router.GET("/", display.FindPlayer(), display.ShowIndexPage)
 
-	// Routes that look at things
+	// Routes that look at tables that are already in client memory
 	display.Router.GET("/back", display.FindPlayer(), display.Back)
 	display.Router.GET("/forward", display.FindPlayer(), display.Forward)
-	display.Router.GET("/quit", display.FindPlayer(), display.Quit)
 
 	//Routes that do things
+	display.Router.GET("/quit/", display.FindPlayer(), display.Quit)
 	display.Router.GET("/action/:action", display.FindPlayer(), display.ActionHandler)
 	display.Router.GET("/user/create/:id", display.FindPlayer(), display.CreateSimulation)
 	display.Router.GET("/user/switch/:id", display.FindPlayer(), display.SwitchSimulation)

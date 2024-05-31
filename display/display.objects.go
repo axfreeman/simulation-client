@@ -73,13 +73,14 @@ func FindPlayer() gin.HandlerFunc {
 
 		// find out what the browser knows
 		userCookie, err := ctx.Request.Cookie("user")
-		if err == nil {
+		if err != nil {
 			setPlayer(ctx, `guest`)
 			return
 		}
 
 		// Comment for briefer diagnostics
-		utils.Trace(utils.BrightMagenta, fmt.Sprintf("Cookie returned: %v\n", userCookie.Value))
+		utils.Trace(utils.BrightMagenta, fmt.Sprintf("Cookie returned: %v\n", userCookie))
+		utils.Trace(utils.BrightMagenta, fmt.Sprintf("Cookie name was: %v\n", userCookie.Value))
 		username := userCookie.Value
 
 		// Ask the server what it knows about this user
