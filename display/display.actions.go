@@ -70,8 +70,10 @@ func ActionHandler(ctx *gin.Context) {
 	act := ctx.Param("action")
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 		return
 	}
+
 	user := userobject.(*models.User)
 	username := user.UserName
 	utils.Trace(utils.Yellow, fmt.Sprintf("User %s wants to perform action %s. Last visited page was %s\n", username, act, user.LastVisitedPage))
@@ -121,6 +123,7 @@ func ActionHandler(ctx *gin.Context) {
 		ctx.Request.URL.Path = "/"
 	}
 	Router.HandleContext(ctx)
+	ctx.Abort()
 }
 
 type CloneResult struct {
@@ -140,7 +143,7 @@ func CreateSimulation(ctx *gin.Context) {
 
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 	username := user.UserName
@@ -195,7 +198,7 @@ func Back(ctx *gin.Context) {
 	utils.Trace(utils.White, "Back was requested\n")
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 
@@ -224,7 +227,7 @@ func Forward(ctx *gin.Context) {
 	utils.Trace(utils.White, "Forward was requested\n")
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 	if user.ViewedTimeStamp < user.TimeStamp {

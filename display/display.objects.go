@@ -33,13 +33,6 @@ var Router *gin.Engine = gin.New()
 //			If successful, pass on the user object and username using ctx.Set()
 //
 
-func DivertToLogin(ctx *gin.Context, message string) {
-	utils.Trace(utils.Purple, message)
-	ctx.Request.URL.Path = "/admin/choose-players"
-	Router.HandleContext(ctx)
-	ctx.Abort()
-}
-
 func DisplayErrorScreen(ctx *gin.Context, message string) {
 	utils.Trace(utils.Red, message)
 	ctx.HTML(http.StatusBadRequest, "errors.html", gin.H{
@@ -48,7 +41,26 @@ func DisplayErrorScreen(ctx *gin.Context, message string) {
 	ctx.Abort()
 }
 
-func SynchWithServer() gin.HandlerFunc {
+func setPlayer(ctx *gin.Context, username string) *models.User {
+	user, ok := models.Users[username]
+	if !ok {
+		DisplayErrorScreen(ctx, fmt.Sprintf("Sorry, %s is not recognised as a player \n", username))
+	}
+	if user.ApiKey == "" {
+		DisplayErrorScreen(ctx, fmt.Sprintf("Sorry, %s has no credentials as a player \n", username))
+	}
+	utils.Trace(utils.BrightMagenta, fmt.Sprintf("Cookie with Username %s is OK and will be passed to the server\n", username))
+	ctx.Set("userobject", user)
+	return user
+}
+
+// Minimal middleware verifies the user and server connection without
+// enforcing login. Looks for a cookie, checks with the server.
+//
+//		If its ok, pass on the user details to the next handler using ctx.Set().
+//		If not, pass on 'guest' user.
+//	 If an error is encountered, redirect to the error page.
+func FindPlayer() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		// Check whether the server is responding at all.
@@ -61,20 +73,14 @@ func SynchWithServer() gin.HandlerFunc {
 
 		// find out what the browser knows
 		userCookie, err := ctx.Request.Cookie("user")
-		if err != nil {
-			DivertToLogin(ctx, fmt.Sprintf("We could not retrieve a user cookie because: %v\n", err))
+		if err == nil {
+			setPlayer(ctx, `guest`)
 			return
 		}
 
 		// Comment for briefer diagnostics
 		utils.Trace(utils.BrightMagenta, fmt.Sprintf("Cookie returned: %v\n", userCookie.Value))
 		username := userCookie.Value
-
-		user := models.Users[username]
-		if user.ApiKey == "" {
-			DivertToLogin(ctx, "This user has no api key\n")
-			return
-		}
 
 		// Ask the server what it knows about this user
 		// Use the admin backdoor to get the information.
@@ -83,11 +89,11 @@ func SynchWithServer() gin.HandlerFunc {
 			DisplayErrorScreen(ctx, fmt.Sprintf("Sorry, the server is not functioning :%v\n", err))
 			return
 		}
-
 		synched_user := new(models.User)          // Isolated user record, not added to the list of users.
 		err = json.Unmarshal(body, &synched_user) // it's only there as a receptacle for the server data.
 		if err != nil {
-			DivertToLogin(ctx, fmt.Sprintf("Couldn't make sense of what the server said about user %s :%v\n", username, err))
+			utils.Trace(utils.BrightMagenta, fmt.Sprintf("Couldn't make sense of what the server said about user %s :%v\n", username, err))
+			setPlayer(ctx, `guest`)
 			return
 		}
 
@@ -95,13 +101,15 @@ func SynchWithServer() gin.HandlerFunc {
 		// userDetails, _ := json.MarshalIndent(synched_user, " ", " ")
 		// utils.Trace(utils.BrightMagenta, fmt.Sprintf("The server sent this user record: %s\n", string(userDetails)))
 
-		// Is the user locked at the server? If not, force login
+		// Is the user locked at the server?
 		if !synched_user.IsLocked {
-			DivertToLogin(ctx, fmt.Sprintf("%s is not locked at the server and cannot play\n", synched_user.UserName))
+			utils.Trace(utils.BrightMagenta, fmt.Sprintf("%s is not locked at the server and cannot play\n", synched_user.UserName))
+			setPlayer(ctx, `guest`)
 			return
 		}
 
 		// The Server and Client agree that this user can go ahead
+		user := setPlayer(ctx, username)
 		user.IsLocked = true
 		utils.Trace(utils.BrightMagenta, fmt.Sprintf(
 			"The server says the current simulation is %d; client says it is %d\n",
@@ -117,13 +125,12 @@ func SynchWithServer() gin.HandlerFunc {
 
 			// Yes, we do need to update
 			if !fetch.FetchUserObjects(ctx, username) {
-				DivertToLogin(ctx, fmt.Sprintf("ERROR: Could not retrieve data for user %s\n", username))
+				DisplayErrorScreen(ctx, fmt.Sprintf("ERROR: Could not retrieve data for user %s\n", username))
 				return
 			}
 		}
 
 		user.LastVisitedPage = ctx.Request.URL.Path
-		ctx.Set("userobject", user)
 		utils.Trace(utils.BrightMagenta, fmt.Sprintf("User %s is good to go\n", username))
 	}
 }
@@ -166,7 +173,7 @@ func set_current_state(username string, new_state string) {
 func ShowCommodities(ctx *gin.Context) {
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 	state := user.Get_current_state()
@@ -185,7 +192,7 @@ func ShowCommodities(ctx *gin.Context) {
 func ShowIndustries(ctx *gin.Context) {
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 	state := user.Get_current_state()
@@ -204,7 +211,7 @@ func ShowIndustries(ctx *gin.Context) {
 func ShowClasses(ctx *gin.Context) {
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 	state := user.Get_current_state()
@@ -226,7 +233,7 @@ func ShowClasses(ctx *gin.Context) {
 func ShowCommodity(ctx *gin.Context) {
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 
@@ -250,7 +257,7 @@ func ShowCommodity(ctx *gin.Context) {
 func ShowIndustry(ctx *gin.Context) {
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 	state := user.Get_current_state()
@@ -272,7 +279,7 @@ func ShowIndustry(ctx *gin.Context) {
 func ShowClass(ctx *gin.Context) {
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 
@@ -302,7 +309,7 @@ func ShowIndexPage(ctx *gin.Context) {
 
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		utils.Trace(utils.Red, "The middleware failed to provide a user object")
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 		return
 	}
 
@@ -315,8 +322,9 @@ func ShowIndexPage(ctx *gin.Context) {
 
 	// if user has no simulations, redirect to the user dashboard
 	if u.CurrentSimulationID == 0 {
-		ctx.Request.URL.Path = `/user/dashboard`
-		Router.HandleContext(ctx)
+		ctx.Redirect(http.StatusPermanentRedirect, `/user/dashboard`)
+		// ctx.Request.URL.Path = `/user/dashboard`
+		// Router.HandleContext(ctx)
 		ctx.Abort()
 	}
 
@@ -348,7 +356,7 @@ func ShowIndexPage(ctx *gin.Context) {
 func ShowTrace(ctx *gin.Context) {
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 	state := user.Get_current_state()
@@ -375,7 +383,7 @@ func UserDashboard(ctx *gin.Context) {
 
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 	state := user.Get_current_state()
@@ -389,6 +397,7 @@ func UserDashboard(ctx *gin.Context) {
 		"username":    user.UserName,
 		"state":       state,
 	})
+	ctx.Abort()
 }
 
 // Diagnostic endpoint to display the data in the system.
@@ -400,7 +409,7 @@ func DataHandler(ctx *gin.Context) {
 func SwitchSimulation(ctx *gin.Context) {
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 	id, _ := strconv.Atoi(ctx.Param("id"))
@@ -422,7 +431,7 @@ func RestartSimulation(ctx *gin.Context) {
 func ShowIndustryStocks(ctx *gin.Context) {
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 
@@ -444,7 +453,7 @@ func ShowIndustryStocks(ctx *gin.Context) {
 func ShowClassStocks(ctx *gin.Context) {
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 

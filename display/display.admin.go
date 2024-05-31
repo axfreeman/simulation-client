@@ -27,8 +27,8 @@ func AdminDashboard(ctx *gin.Context) {
 func AdminReset(ctx *gin.Context) {
 }
 
-// Authorization function.
-// Requests the server to authorize user to play.
+// Simple authorization page. Allows the user to choose who to play as.
+// Requests the server to authorize the selected user.
 // The client should already know this user's ApiKey.
 // This is not a token system. It simply averts conflicts by ensuring
 // that only one client can play as a given user at the same time.
@@ -63,18 +63,19 @@ func SelectUser(ctx *gin.Context) {
 	// see, eg https://stackoverflow.com/questions/10617954/chrome-doesnt-delete-session-cookies/10772420#10772420
 	utils.Trace(utils.Gray, fmt.Sprintf("user %s will play\n", username))
 	http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: username, Path: "/"})
-	ctx.Redirect(http.StatusPermanentRedirect, `/user/dashboard`)
-	// ctx.Request.URL.Path = `/`
-	// Router.HandleContext(ctx)
+	ctx.Request.URL.Path = `/`
+	Router.HandleContext(ctx)
+	ctx.Abort()
+
 }
 
-func Lock(ctx *gin.Context) {
-	ctx.HTML(http.StatusOK, "choose-player.html", gin.H{
-		"Title":      "Choose player",
-		"adminusers": models.AdminUserList,
-		"users":      models.Users,
-	})
-}
+// func DisplayPlayerChoice(ctx *gin.Context) {
+// 	ctx.HTML(http.StatusOK, "choose-player.html", gin.H{
+// 		"Title":      "Choose player",
+// 		"adminusers": models.AdminUserList,
+// 		"users":      models.Users,
+// 	})
+// }
 
 // Quit playing as the current user.
 //
@@ -86,7 +87,7 @@ func Quit(ctx *gin.Context) {
 	utils.Trace(utils.Gray, "Quit was requested\n")
 	userobject, ok := ctx.Get("userobject")
 	if !ok {
-		return
+		DisplayErrorScreen(ctx, "Couldn't find a player. This is a programme error.\n")
 	}
 	user := userobject.(*models.User)
 	user.IsLocked = false
