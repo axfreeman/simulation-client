@@ -64,7 +64,7 @@ func (d *DataObject) Fetch() bool {
 func FetchGlobalObject(url string, target any) bool {
 	resp, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Output(1, fmt.Sprint("Error constructing server request", err))
+		utils.Trace(utils.BrightWhite, fmt.Sprint("Error constructing server request", err))
 		return false
 	}
 
@@ -72,12 +72,12 @@ func FetchGlobalObject(url string, target any) bool {
 	client := &http.Client{Timeout: time.Second * 2} // Timeout after 2 seconds
 	res, _ := client.Do(resp)
 	if res == nil {
-		log.Output(1, "Server did not respond")
+		utils.Trace(utils.BrightWhite, "Server did not respond")
 		return false
 	}
 
 	if res.StatusCode != 200 {
-		log.Output(1, "Server rejected admin request")
+		utils.Trace(utils.BrightWhite, fmt.Sprintf("Server rejected admin request with status code %d\n", res.StatusCode))
 		return false
 	}
 
@@ -86,7 +86,7 @@ func FetchGlobalObject(url string, target any) bool {
 
 	jsonErr := json.Unmarshal(body_as_string, target)
 	if jsonErr != nil {
-		log.Output(1, fmt.Sprint("Could not unmarshal the server response:\n", string(body_as_string)))
+		utils.Trace(utils.BrightWhite, fmt.Sprint("Could not unmarshal the server response:\n", string(body_as_string)))
 		return false
 	}
 	utils.Trace(utils.BrightWhite, fmt.Sprintf("Request for data from endpoint %s accepted\n", url))
