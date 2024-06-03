@@ -39,15 +39,16 @@ func FetchUserObjects(ctx *gin.Context, username string) bool {
 	return true
 }
 
-// Runs once at startup.
-// Retrieve users and templates from the server database.
-func Initialise() {
+// Retrieve templates from the server database.
+func InitialiseTemplates() {
 	// Retrieve the templates on the server
 	if !api.FetchGlobalObject(utils.APISOURCE+`templates/templates`, &models.TemplateList) {
 		log.Fatal("Could not retrieve templates information from the server. Stopping")
 	}
+}
 
-	// Retrieve users on the server
+// Retrieve users from the servere database
+func InitialiseUsers() {
 	if !api.FetchGlobalObject(utils.APISOURCE+`admin/users`, &models.AdminUserList) {
 		log.Fatal("Could not retrieve user information from the server. Stopping")
 	}

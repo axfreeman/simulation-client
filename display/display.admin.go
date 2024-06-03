@@ -5,6 +5,7 @@ package display
 
 import (
 	"capfront/api"
+	"capfront/fetch"
 	"capfront/models"
 	"capfront/utils"
 	"fmt"
@@ -116,6 +117,7 @@ func Quit(ctx *gin.Context) {
 		http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: user.UserName, Path: "/", MaxAge: 0})
 		utils.Trace(utils.Gray, fmt.Sprintf("%s has quit\n", user.UserName))
 	}
+	fetch.InitialiseUsers()
 
 	ctx.HTML(http.StatusOK, "choose-player.html", gin.H{
 		"Title": "Choose player",

@@ -54,7 +54,8 @@ func main() {
 	// Note that user data on the server are changing as users come and go,
 	// so we have to resynchronise whenever we make use of these data.
 	// This is the purpose of the player handlers.
-	fetch.Initialise()
+	fetch.InitialiseTemplates()
+	fetch.InitialiseUsers()
 
 	// Uncomment in extremis for very verbose diagnostic. As a first resort use the /Data endpoint when simulation is running.
 	// display.ListData()
