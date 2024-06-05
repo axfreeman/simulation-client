@@ -1,10 +1,8 @@
 # Unsystematic list of required changes and fixes.  
 ## Semi-immediate
-* At startup does not connect to server (This is because of Heroku ephemeral file system so we have to switch to PostGres unfortunately)
-* We don't know when and why it switches to the player selection at first use
+
 * Once in as user guest, and switch to another player, we are returned to the dashboard as user guest.
-* When we then refresh we get an error that we cannot play as whoever we select
-* But we can then go to the user dashboard and it's OK
+When we then refresh we get an error that we cannot play as whoever we select. But we can then go to the user dashboard and it's OK
 
 ## Some time
 * Get 'static' working  
@@ -18,3 +16,6 @@
 * Should be able to delete user simulations 
 * Should be able to view user simulations
 
+## Resolved
+* At startup does not connect to server. Fixed by changing to IONOS server.  
+* We don't know when and why it switches to the player selection at first use (I think this was resolved by changing to IONOS).  

@@ -69,9 +69,11 @@ func SelectUser(ctx *gin.Context) {
 	// see, eg https://stackoverflow.com/questions/10617954/chrome-doesnt-delete-session-cookies/10772420#10772420
 	utils.Trace(utils.Gray, fmt.Sprintf("User %s will play\n", username))
 	http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: username, Path: "/"})
-	ctx.Request.URL.Path = `/user/dashboard`
-	Router.HandleContext(ctx)
+	ctx.Redirect(http.StatusMovedPermanently, `/user/dashboard`)
+	// ctx.Request.URL.Path = `/user/dashboard`
+	// Router.HandleContext(ctx)
 	ctx.Abort()
+	http.SetCookie(ctx.Writer, &http.Cookie{Name: "user", Value: username, Path: "/"})
 }
 
 // func DisplayPlayerChoice(ctx *gin.Context) {
