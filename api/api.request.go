@@ -39,7 +39,7 @@ func ServerRequest(apiKey string, url string) ([]byte, error) {
 	res, _ := client.Do(resp)
 	if res == nil {
 		utils.Trace(utils.Red, "Server is down or misbehaving\n")
-		return nil, errors.New("server did not respond")
+		return nil, errors.New("Server did not respond to ServerRequest\n")
 	}
 
 	defer res.Body.Close()

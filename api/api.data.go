@@ -70,9 +70,13 @@ func FetchGlobalObject(url string, target any) bool {
 
 	resp.Header.Add("x-api-key", utils.ADMINKEY)
 	client := &http.Client{Timeout: time.Second * 2} // Timeout after 2 seconds
-	res, _ := client.Do(resp)
+	res, reserr := client.Do(resp)
+	if reserr != nil {
+		utils.Trace(utils.BrightWhite, fmt.Sprintf("Server returned error:%v\n", reserr))
+		return false
+	}
 	if res == nil {
-		utils.Trace(utils.BrightWhite, "Server did not respond")
+		utils.Trace(utils.BrightWhite, "Server response was empty\n")
 		return false
 	}
 
