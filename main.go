@@ -14,7 +14,7 @@ func main() {
 
 	// load the templates
 	display.Router.LoadHTMLGlob("./templates/**/*")
-	fmt.Println("The Rosy Dawn of Capitalism has begun")
+	fmt.Println("The Rosy Dawn of Capitalism has commenced")
 
 	// Admin group.
 	// These all access the api by the admin backdoor so are exempt from authorization.
