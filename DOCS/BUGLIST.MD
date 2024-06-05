@@ -1,8 +1,4 @@
 # Unsystematic list of required changes and fixes.  
-## Semi-immediate
-
-* Once in as user guest, and switch to another player, we are returned to the dashboard as user guest.
-When we then refresh we get an error that we cannot play as whoever we select. But we can then go to the user dashboard and it's OK
 
 ## Some time
 * Get 'static' working  
@@ -19,3 +15,5 @@ When we then refresh we get an error that we cannot play as whoever we select. B
 ## Resolved
 * At startup does not connect to server. Fixed by changing to IONOS server.  
 * We don't know when and why it switches to the player selection at first use (I think this was resolved by changing to IONOS).  
+* Once in as user guest, and switch to another player, we are returned to the dashboard as user guest.
+When we then refresh we get an error that we cannot play as whoever we select. But we can then go to the user dashboard and it's OK
